@@ -1,3 +1,13 @@
-@(webJarAssets: WebJarAssets)
-
-@main("Home"){<p>Welcome home</p>}(webJarAssets)
+@()(implicit webJarAssets: WebJarAssets)
+@main("Home"){
+<div class="container">
+    <div class="page-header">
+        <h1>Welcome</h1>
+        <p class="lead">The beginning of your home page</p>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">Nav column</div>
+        <div class="col-sm-8">Main column</div>
+    </div>
+</div>
+}
