@@ -3,7 +3,7 @@
 * It takes two arguments, a `String` for the title of the page and an
 * `Html` object to insert into the body of the page.
 *@
-@(title: String)(content: Html)(implicit webJarAssets: WebJarAssets)
+@(title: String)(header: String)(intro: String)(content: Html)(implicit webJarAssets: WebJarAssets)
 
 <html lang="en">
     <head>
@@ -13,6 +13,12 @@
         <script src='@routes.Assets.versioned("javascripts/hello.js")' type="text/javascript"></script>
     </head>
     <body>
-        @content
+        <div class="container">
+            <div class="page-header">
+                <h1>@header</h1>
+                <p class="lead">@intro</p>
+            </div>
+            @content
+        </div>
     </body>
 </html>

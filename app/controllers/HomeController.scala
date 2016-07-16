@@ -1,9 +1,9 @@
 package controllers
 
-import javax.inject._
+import com.google.inject.Inject
 
 import play.Logger
-import play.api.mvc._
+import play.api.mvc.{Action, Controller}
 
 /**
   * Controller for the landing page
