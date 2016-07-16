@@ -1,10 +1,11 @@
 package controllers
 
 import config.ControllerSpec
+import connectors.DatabaseConnector
 import play.api.test.Helpers._
 
 class UnitControllerSpec extends ControllerSpec{
-  val controller = new UnitController
+  val controller = new UnitController(application.injector.instanceOf[DatabaseConnector])
 
   "displayUnitdetails" must "load the unit details page for the given id" in {
     val result112 = controller.displayUnitDetails(112).apply(simpleRequest)

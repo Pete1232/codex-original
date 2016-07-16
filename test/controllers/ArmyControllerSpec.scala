@@ -1,12 +1,12 @@
 package controllers
 
 import config.ControllerSpec
-import connectors.MockDatabaseConnector
+import connectors.{DatabaseConnector, MockDatabase}
 import play.api.test.Helpers._
 
 class ArmyControllerSpec extends ControllerSpec{
-  val controller = new ArmyController
-  val testDB = MockDatabaseConnector.mockInfantryDatabase
+  val controller = new ArmyController(application.injector.instanceOf[DatabaseConnector])
+  val testDB = MockDatabase.db
   "displayArmyList" must "load the army list page" in {
     val result = controller.displayArmyList.apply(simpleRequest)
     status(result) mustBe 200
