@@ -16,9 +16,15 @@ project/project
 project/target
 project/plugins/project/
 
+# Play specific
+/logs/application.log
+
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
 
 # Intellij specific
 .idea
+
+# Local scalastyle config
+/project/scalastyle-config.xml

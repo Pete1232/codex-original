@@ -1,5 +1,3 @@
-logLevel := Level.Warn
-
 // The Typesafe repository
 resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/maven-releases/"
 
@@ -7,3 +5,5 @@ resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/maven-
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.4")
 // Produce test coverage reports
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.3.5")
+// Scala code linter
+addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
