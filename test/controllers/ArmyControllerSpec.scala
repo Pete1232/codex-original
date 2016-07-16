@@ -1,13 +1,21 @@
 package controllers
 
 import config.ControllerSpec
+import connectors.MockDatabaseConnector
 import play.api.test.Helpers._
 
 class ArmyControllerSpec extends ControllerSpec{
   val controller = new ArmyController
+  val testDB = MockDatabaseConnector.mockInfantryDatabase
   "displayArmyList" must "load the army list page" in {
     val result = controller.displayArmyList.apply(simpleRequest)
     status(result) mustBe 200
     contentAsString(result) must include("<title>Army Roster</title>")
+  }
+  it should "contain a div for each infantry in the database" in {
+    val result = controller.displayArmyList.apply(simpleRequest)
+    testDB.values.map {infantry =>
+      contentAsString(result) must include(s"<div>${infantry.name}</div>")
+    }
   }
 }

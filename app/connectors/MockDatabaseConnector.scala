@@ -10,4 +10,8 @@ object MockDatabaseConnector extends DatabaseConnector{
   override def getUnitById(id: Int): Infantry = {
     mockInfantryDatabase.values.find(_.id==id).get
   }
+
+  override def getAllUnits: Set[Infantry] = {
+    mockInfantryDatabase.values.toSet
+  }
 }

@@ -1,3 +1,6 @@
-@()(implicit webJarAssets: WebJarAssets)
+@(army: Set[Infantry])(implicit webJarAssets: WebJarAssets)
 @main("Army Roster")("Army roster")("List of all the Eldar soldiers and vehicles"){
+    @for(infantry <- army){
+        <div>@infantry.name</div>
+    }
 }
