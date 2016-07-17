@@ -8,4 +8,8 @@ object MockDatabase {
     "windrider" -> Infantry(114, "Windriders", CombatRole.Troops),
     "fire_dragons" -> Infantry(119, "Fire Dragons", CombatRole.Elites)
   )
+
+  val userDb = Map(
+    "user" -> "password"
+  )
 }
