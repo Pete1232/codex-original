@@ -2,8 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
-import forms.User
-import forms.User.userForm
+import forms.UserForm.userForm
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, Controller}
 
@@ -19,8 +18,7 @@ class LoginController @Inject()(implicit webJarAssets: WebJarAssets, val message
         BadRequest(views.html.login(formWithErrors))
       },
       userData => {
-        // TODO user should be in the models package
-        val newUser = forms.User(userData.userId, userData.password)
+        val newUser = models.User(userData.userId, userData.password)
         Redirect(routes.HomeController.home)
       }
     )

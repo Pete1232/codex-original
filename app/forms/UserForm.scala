@@ -1,15 +1,10 @@
 package forms
 
+import models.User
 import play.api.data.Form
 import play.api.data.Forms._
 
-case class User(userId: String, password: String) {
-  def validate(password: String) = {
-    password.length > 5
-  }
-}
-
-object User {
+object UserForm {
   val userForm = Form(
     mapping(
       "userId" -> nonEmptyText,
