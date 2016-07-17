@@ -1,6 +1,7 @@
 # Routes
 GET     /                           controllers.HomeController.home
 GET     /login                      controllers.LoginController.login
+POST    /login                      controllers.LoginController.loginPost
 GET     /army                       controllers.ArmyController.displayArmyList
 GET     /army/:id                   controllers.UnitController.displayUnitDetails(id: Int)
 
