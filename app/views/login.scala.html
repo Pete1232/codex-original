@@ -1,3 +1,9 @@
-@()(implicit webJarAssets: WebJarAssets)
+@import helper._
+
+@(userForm: Form[forms.User])(implicit webJarAssets: WebJarAssets, messages: Messages)
 @main("Login")("Sign-in to your account")("You must log in to view the page you requested"){
+    @form(action = routes.LoginController.login(), 'id -> "loginForm") {
+        @inputText(userForm("userId"))
+        @inputText(userForm("password"))
+    }
 }
