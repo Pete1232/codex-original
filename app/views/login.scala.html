@@ -7,4 +7,14 @@
         @inputText(userForm("password"))
         <input type="submit" id="submit" name="submit"/>
     }
+    @if(userForm.hasErrors) {
+    <div class="alert-message error">
+        <p>Please correct the following:</p>
+        <ul>
+            @userForm.errors.map { error =>
+            <li>@error.key @error.message</li>
+            }
+        </ul>
+    </div>
+    }
 }
