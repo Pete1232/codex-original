@@ -3,8 +3,8 @@
 @(userForm: Form[models.User])(implicit webJarAssets: WebJarAssets, messages: Messages)
 @main("Login")("Sign-in to your account")("You must log in to view the page you requested"){
     @form(action = routes.LoginController.loginPost(), 'id -> "loginForm") {
-        @inputText(userForm("userId"))
-        @inputText(userForm("password"))
+        @inputText(userForm("userId"), '_showErrors -> false)
+        @inputText(userForm("password"), '_showErrors -> false)
         <input type="submit" id="submit" name="submit"/>
     }
     @if(userForm.hasErrors) {
