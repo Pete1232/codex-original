@@ -1,2 +1,3 @@
 login.validation.length=Passwords must contain more than 5 characters
+login.validation.credentials=The userId and password you entered do not match
 error.required=The {0} field is required

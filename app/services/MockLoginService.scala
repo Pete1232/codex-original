@@ -1,0 +1,5 @@
+package services
+
+import connectors.MockUserDatabaseConnector
+
+object MockLoginService extends MockUserDatabaseConnector with LoginService

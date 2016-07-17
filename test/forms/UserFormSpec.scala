@@ -15,4 +15,7 @@ class UserFormSpec extends UnitSpec{
   it must "not validate a password of lenghth 5 or less" in {
     UserForm.userForm.bind(Map("userId" -> "user", "password" -> "pass")).hasErrors mustBe true
   }
+  it must "not validate bad credentials" in {
+    UserForm.userForm.bind(Map("userId" -> "user", "password" -> "p2ssword")).hasErrors mustBe true
+  }
 }

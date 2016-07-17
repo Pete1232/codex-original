@@ -3,6 +3,7 @@ package forms
 import models.User
 import play.api.data.Form
 import play.api.data.Forms._
+import services.MockLoginService
 
 object UserForm {
   val userForm = Form(
@@ -13,6 +14,10 @@ object UserForm {
         .verifying(
           "login.validation.length",
           user => user.validate(user.password)
+        )
+        .verifying(
+          "login.validation.credentials",
+          user => MockLoginService.validateUser(user)
         )
   )
 }
