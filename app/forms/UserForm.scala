@@ -11,7 +11,7 @@ object UserForm {
       "password" -> nonEmptyText
     )(User.apply)(User.unapply)
         .verifying(
-          "Password must be longer than 5 characters",
+          "login.validation.length",
           user => user.validate(user.password)
         )
   )

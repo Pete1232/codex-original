@@ -3,6 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import forms.UserForm.userForm
+import play.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, Controller}
 
@@ -15,6 +16,7 @@ class LoginController @Inject()(implicit webJarAssets: WebJarAssets, val message
   val loginPost = Action{implicit request =>
     userForm.bindFromRequest.fold(
       formWithErrors => {
+        formWithErrors.errors.foreach(error => Logger.info(s"Validation error on field ${error.messages}"))
         BadRequest(views.html.login(formWithErrors))
       },
       userData => {

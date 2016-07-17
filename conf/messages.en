@@ -1,1 +1,2 @@
-login.validation.length="Passwords must contain more than 5 characters"
+login.validation.length=Passwords must contain more than 5 characters
+error.required=The {0} field is required

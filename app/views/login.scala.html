@@ -12,7 +12,7 @@
         <p>Please correct the following:</p>
         <ul>
             @userForm.errors.map { error =>
-            <li>@error.key @error.message</li>
+            <li>@Messages(error.message, error.key)</li>
             }
         </ul>
     </div>
