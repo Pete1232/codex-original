@@ -30,9 +30,6 @@ class UserFormSpec extends UnitSpec{
     error.key mustBe "password"
     error.message mustBe "error.required"
   }
-  it must "not validate a password of lenghth 5 or less" in {
-    testForAnError("user", "pass", "login.validation.length")
-  }
   it must "not validate bad credentials" in {
     testForAnError("user", "p2ssword", "login.validation.credentials")
   }

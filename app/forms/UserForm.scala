@@ -12,10 +12,6 @@ object UserForm {
       "password" -> nonEmptyText
     )(User.apply)(User.unapply)
         .verifying(
-          "login.validation.length",
-          user => user.validate
-        )
-        .verifying(
           "login.validation.credentials",
           user => MockLoginService.validateUser(user)
         )
