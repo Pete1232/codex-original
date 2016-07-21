@@ -16,6 +16,10 @@ object UserForm {
           user => user.validate(user.password)
         )
         .verifying(
+          "login.validation.userId",
+          user => MockLoginService.isKnown(user)
+        )
+        .verifying(
           "login.validation.credentials",
           user => MockLoginService.validateUser(user)
         )
