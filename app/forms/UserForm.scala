@@ -13,11 +13,7 @@ object UserForm {
     )(User.apply)(User.unapply)
         .verifying(
           "login.validation.length",
-          user => user.validate(user.password)
-        )
-        .verifying(
-          "login.validation.userId",
-          user => MockLoginService.isKnown(user)
+          user => user.validate
         )
         .verifying(
           "login.validation.credentials",

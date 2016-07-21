@@ -6,6 +6,4 @@ class MockUserDatabaseConnector extends UserDatabaseConnector{
     MockDatabase.userDb
       .applyOrElse(user.userId, (s: String) => "") == user.password
   }
-  override def isKnownUser(user: User): Boolean =
-    MockDatabase.userDb.contains(user.userId)
 }

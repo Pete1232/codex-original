@@ -37,6 +37,24 @@ class UserFormSpec extends UnitSpec{
     testForAnError("user", "p2ssword", "login.validation.credentials")
   }
   it must "not validate a userId that does not exist in the database" in {
-    testForAnError("notAUser", "password", "login.validation.userId")
+    testForAnError("notAUser", "password", "login.validation.credentials")
+  }
+  it must "not validate userId or password if the userId is empty" in {
+    val errors = UserForm.userForm
+      .bind(Map("userId" -> "", "password" -> "password"))
+      .errors
+    errors.foreach {error =>
+      error.message must not be "login.validation.userId"
+      error.message must not be "login.validation.credentials"
+    }
+  }
+  it must "not validate userId or password if the password is empty" in {
+    val errors = UserForm.userForm
+      .bind(Map("userId" -> "user", "password" -> ""))
+      .errors
+    errors.foreach {error =>
+      error.message must not be "login.validation.userId"
+      error.message must not be "login.validation.credentials"
+    }
   }
 }

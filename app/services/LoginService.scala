@@ -8,7 +8,4 @@ trait LoginService {
   def validateUser(user: User): Boolean = {
     validatePasswordForUser(user)
   }
-  def isKnown(user: User): Boolean = {
-    isKnownUser(user)
-  }
 }
