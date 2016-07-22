@@ -1,3 +1,6 @@
-@()(implicit webJarAssets: WebJarAssets)
+@(userId: String)(implicit webJarAssets: WebJarAssets)
 @main("Your Account")("Your Account")("View your account details"){
+    <div id="userId">
+        Your user identification code is <b>@userId</b>
+    </div>
 }
