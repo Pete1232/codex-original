@@ -2,6 +2,7 @@ package controllers
 
 import config.ControllerSpec
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.mvc.Session
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
@@ -39,7 +40,14 @@ class LoginControllerSpec extends ControllerSpec with I18nSupport{
     resultString must include("<div class=\"alert-message error\">")
     resultString must include(Messages("login.validation.credentials"))
   }
-  it must "redirect to home with a session cookie after login" ignore {
-
+  it must "redirect to home with a session cookie after login" in running(application) {
+    val loginSuccessResult = controller.loginPost
+      .apply(FakeRequest.apply()
+        .withFormUrlEncodedBody(
+          "userId" -> "user",
+          "password" -> "password"
+        ))
+    status(loginSuccessResult) mustBe 303
+    session(loginSuccessResult) mustBe (Session(Map("userId" -> "user")))
   }
 }

@@ -20,8 +20,8 @@ class LoginController @Inject()(implicit webJarAssets: WebJarAssets, val message
         BadRequest(views.html.login(formWithErrors))
       },
       userData => {
-        val newUser = models.User(userData.userId, userData.password)
         Redirect(routes.HomeController.home)
+          .withSession("userId" -> userData.userId)
       }
     )
   }
