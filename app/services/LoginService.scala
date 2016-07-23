@@ -3,9 +3,11 @@ package services
 import connectors.UserDatabaseConnector
 import models.User
 
+import scala.concurrent.Future
+
 trait LoginService {
   this: UserDatabaseConnector =>
-  def validateUser(user: User): Boolean = {
+  def validateUser(user: User): Future[Boolean] = {
     validatePasswordForUser(user)
   }
 }
