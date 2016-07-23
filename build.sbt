@@ -12,6 +12,12 @@ lazy val codex = (project in file("."))
     testOptions in Test := Seq(Tests.Filter(unitFilter)),
     testOptions in IntegrationTest := Seq(Tests.Filter(itFilter))
   )
+  .settings(
+    javaOptions in Test +="-Dlogger.resource=logback-test.xml"
+  )
+  .settings(
+    javaOptions in IntegrationTest +="-Dlogger.resource=logback-test.xml"
+  )
 
 libraryDependencies ++= Seq(
   appDependencies,
