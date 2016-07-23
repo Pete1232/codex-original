@@ -6,5 +6,5 @@ import scala.concurrent.Future
 
 trait DatabaseConnector {
   def getUnitById(id: Int): Future[Option[Infantry]]
-  def getAllUnits: List[Infantry]
+  def getAllUnits: Future[List[Infantry]]
 }

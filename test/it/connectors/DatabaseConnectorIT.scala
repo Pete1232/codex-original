@@ -15,9 +15,9 @@ class DatabaseConnectorIT extends UnitSpec{
     Await.result(connector.getUnitById(123), Duration.Inf).get.name mustBe "Swooping Hawks"
   }
   "getAllUnits" must "return a set of all units in the database, ordered by id" in {
-    connector.getAllUnits.size mustBe expectedInfDBSize
+    Await.result(connector.getAllUnits, Duration.Inf).size mustBe expectedInfDBSize
     // test for expected first and last entries
-    connector.getAllUnits.head.name mustBe "Guardian Defenders"
-    connector.getAllUnits.last.name mustBe "Avatar of Khaine"
+    Await.result(connector.getAllUnits, Duration.Inf).head.name mustBe "Guardian Defenders"
+    Await.result(connector.getAllUnits, Duration.Inf).last.name mustBe "Avatar of Khaine"
   }
 }

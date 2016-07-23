@@ -11,7 +11,7 @@ class MockDatabaseConnector extends DatabaseConnector{
     Future.successful(Some(MockDatabase.db.values.find(_.id==id).get))
   }
 
-  override def getAllUnits: List[Infantry] = {
-    MockDatabase.db.values.toList
+  override def getAllUnits: Future[List[Infantry]] = {
+    Future.successful(MockDatabase.db.values.toList)
   }
 }

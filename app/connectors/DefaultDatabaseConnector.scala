@@ -41,8 +41,7 @@ class DefaultDatabaseConnector extends DatabaseConnector{
     }
   }
 
-  override def getAllUnits: List[Infantry] = {
-    val result = findAll(Await.result(infantryCollection, Duration.Inf))
-    Await.result(result, Duration.Inf)
+  override def getAllUnits: Future[List[Infantry]] = {
+    findAll(Await.result(infantryCollection, Duration.Inf))
   }
 }

@@ -5,11 +5,15 @@ import connectors.DatabaseConnector
 import play.api.Logger
 import play.api.mvc.{Action, Controller}
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class ArmyController @Inject()(databaseConnector: DatabaseConnector)(implicit webJarAssets: WebJarAssets) extends Controller{
   val armyToDisplay = databaseConnector.getAllUnits
   
-  def displayArmyList = Action {
+  def displayArmyList = Action.async {
     Logger.debug("Loading army list")
-    Ok(views.html.army_list(armyToDisplay))
+    armyToDisplay.map{armyList =>
+      Ok(views.html.army_list(armyList))
+    }
   }
 }
