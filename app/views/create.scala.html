@@ -1,0 +1,20 @@
+@import helper._
+
+@(accountForm: Form[models.User])(implicit webJarAssets: WebJarAssets, messages: Messages)
+@main("Create Account")("Create a new account")("Make a new account to access more services"){
+    @form(action = routes.LoginController.loginPost(), 'id -> "createAccountForm") {
+        @inputText(accountForm("userId"), '_showErrors -> false)
+        @inputText(accountForm("password"), '_showErrors -> false)
+        <input type="submit" id="submit" name="submit"/>
+    }
+    @if(accountForm.hasErrors) {
+    <div class="alert-message error">
+        <p>Please correct the following:</p>
+        <ul>
+            @accountForm.errors.map { error =>
+            <li>@Messages(error.message, error.key)</li>
+            }
+        </ul>
+    </div>
+    }
+}
