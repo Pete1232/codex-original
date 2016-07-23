@@ -1,0 +1,80 @@
+{
+  "id": 112,
+  "name": "Guardian Defenders",
+  "role": "Troops"
+}
+{
+  "id": 113,
+  "name": "Storm Guardians",
+  "role": "Troops"
+}
+{
+  "id": 114,
+  "name": "Windriders",
+  "role": "Troops"
+}
+{
+  "id": 115,
+  "name": "Rangers",
+  "role": "Troops"
+}
+{
+	"id": 116,
+	"name": "Dire Avengers",
+	"role": "Troops"
+}
+{
+  "id": 117,
+  "name": "Howling Banshees",
+  "role": "Elites"
+}
+{
+  "id": 118,
+  "name": "Striking Scorpions",
+  "role": "Elites"
+}
+{
+  "id": 119,
+  "name": "Fire Dragons",
+  "role": "Elites"
+}
+{
+  "id": 120,
+  "name": "Wraithguard",
+  "role": "Elites"
+}
+{
+  "id": 121,
+  "name": "Wraithblades",
+  "role": "Elites"
+}
+{
+  "id": 123,
+  "name": "Swooping Hawks",
+  "role": "FastAttack"
+}
+{
+  "id": 124,
+  "name": "Warp Spiders",
+  "role": "FastAttack"
+}
+{
+  "id": 129,
+  "name": "Dark Reapers",
+  "role": "HeavySupport"
+}
+{
+  "id": 135,
+  "name": "Wraithlord",
+  "role": "HeavySupport"
+}
+{
+  "id": 136,
+  "name": "Wraithknight",
+  "role": "LordsOfWar"
+}
+{
+  "id": 137,
+  "name": "Avatar of Khaine",
+  "role": "LordsOfWar"
+}

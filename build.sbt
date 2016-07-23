@@ -13,7 +13,8 @@ libraryDependencies ++= Seq(
 
 lazy val appDependencies = Seq(
   "org.webjars" %% "webjars-play" % "2.5.0",
-  "org.webjars" % "bootstrap" % "3.3.6"
+  "org.webjars" % "bootstrap" % "3.3.6",
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.11.14"
 )
 
 lazy val testDependencies = Seq(

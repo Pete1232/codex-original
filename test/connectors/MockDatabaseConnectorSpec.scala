@@ -10,6 +10,6 @@ class MockDatabaseConnectorSpec extends UnitSpec{
     mockConnector.getUnitById(114) mustBe testDB("windrider")
   }
   "getAllUnits" must "return a set of all units in the database" in {
-    mockConnector.getAllUnits mustBe testDB.values.toSet
+    mockConnector.getAllUnits mustBe testDB.values.toList
   }
 }
