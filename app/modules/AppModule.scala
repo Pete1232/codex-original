@@ -5,7 +5,7 @@ import play.api.{Configuration, Environment}
 import play.api.inject.{Binding, Module}
 import services.{LoginService, MockLoginService}
 
-class DatabaseModule extends Module{
+class AppModule extends Module{
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = Seq(
     bind[DatabaseConnector].to(new DefaultDatabaseConnector),
     bind[LoginService].to(new MockLoginService)

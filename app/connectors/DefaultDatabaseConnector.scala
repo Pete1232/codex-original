@@ -1,12 +1,12 @@
 package connectors
 import models.{CombatRole, Infantry}
-import reactivemongo.api.{MongoConnection, MongoDriver, ReadPreference}
 import reactivemongo.api.collections.bson.BSONCollection
-import reactivemongo.bson.{BSONDocument, BSONDocumentReader, Macros}
+import reactivemongo.api.{MongoConnection, MongoDriver, ReadPreference}
+import reactivemongo.bson.{BSONDocument, BSONDocumentReader}
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 class DefaultDatabaseConnector extends DatabaseConnector{
   val mongoDriver: MongoDriver = new MongoDriver()
@@ -26,9 +26,10 @@ class DefaultDatabaseConnector extends DatabaseConnector{
     connection.database("codex").
       map(_.collection("infantry"))
 
-  def findById(collection: BSONCollection, id: Int): Future[Option[BSONDocument]] = {
+  def findById(collection: BSONCollection, id: Int): Future[Option[Infantry]] = {
     val query = BSONDocument("id" -> id)
-    collection.find(query).one[BSONDocument]
+    collection.find(query)
+      .one[Infantry]
   }
 
   def findAll(collection: BSONCollection): Future[List[Infantry]] = {
@@ -41,15 +42,7 @@ class DefaultDatabaseConnector extends DatabaseConnector{
   override def getUnitById(id: Int): Infantry = {
     //TODO Should not be awaiting
     val result = findById(Await.result(infantryCollection, Duration.Inf), id)
-    def read(doc: BSONDocument): Infantry = {
-      val id = doc.getAs[Int]("id").get
-      val name = doc.getAs[String]("name").get
-      val role = doc.getAs[String]("role").get
-
-      Infantry(id, name, role = CombatRole.withName(role))
-    }
-
-    read(Await.result(result, Duration.Inf).get)
+    Await.result(result, Duration.Inf).get
   }
 
   override def getAllUnits: List[Infantry] = {
