@@ -19,3 +19,12 @@ abstract class ControllerSpec extends UnitSpec with Results {
 
   val simpleRequest = FakeRequest()
 }
+
+abstract class ControllerIT extends UnitSpec with Results {
+  val controller: Controller
+  val application = new GuiceApplicationBuilder()
+    .build()
+  implicit val webJarAssets = application.injector.instanceOf[WebJarAssets]
+
+  val simpleRequest = FakeRequest()
+}

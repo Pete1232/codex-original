@@ -1,6 +1,7 @@
-package connectors
+package it.connectors
 
 import config.UnitSpec
+import connectors.DefaultDatabaseConnector
 
 class DatabaseConnectorIT extends UnitSpec{
   val connector = new DefaultDatabaseConnector
