@@ -32,3 +32,8 @@ lazy val IntegrationTest = config("it") extend(Test)
 
 def itFilter(name: String): Boolean = name endsWith "IT"
 def unitFilter(name: String): Boolean = name endsWith "Spec"
+
+// test coverage config
+coverageExcludedPackages := """controllers\..*Reverse.*;router.Routes.*;views.html.*;"""
+coverageMinimum := 90
+coverageFailOnMinimum := true
