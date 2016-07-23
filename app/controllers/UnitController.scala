@@ -5,11 +5,14 @@ import connectors.DatabaseConnector
 import play.api.Logger
 import play.api.mvc.{Action, Controller}
 
-class UnitController @Inject()(databaseConnector: DatabaseConnector)(implicit webJarAssets: WebJarAssets) extends Controller{
-  def unitToDisplay(id: Int) = databaseConnector.getUnitById(id)
+import scala.concurrent.ExecutionContext.Implicits.global
 
-  def displayUnitDetails(id: Int) = Action {
+class UnitController @Inject()(databaseConnector: DatabaseConnector)(implicit webJarAssets: WebJarAssets) extends Controller{
+  def displayUnitDetails(id: Int) = Action.async {
     Logger.debug(s"Loading details for id $id")
-    Ok(views.html.unit_detail(unitToDisplay(id)))
+
+    databaseConnector.getUnitById(id).map{maybeUnit =>
+      Ok(views.html.unit_detail(maybeUnit.get))
+    }
   }
 }

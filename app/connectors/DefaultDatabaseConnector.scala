@@ -26,12 +26,6 @@ class DefaultDatabaseConnector extends DatabaseConnector{
     connection.database("codex").
       map(_.collection("infantry"))
 
-  def findById(collection: BSONCollection, id: Int): Future[Option[Infantry]] = {
-    val query = BSONDocument("id" -> id)
-    collection.find(query)
-      .one[Infantry]
-  }
-
   def findAll(collection: BSONCollection): Future[List[Infantry]] = {
     collection.find(BSONDocument())
       .sort(BSONDocument("id" -> 1))
@@ -39,10 +33,12 @@ class DefaultDatabaseConnector extends DatabaseConnector{
       .collect[List]()
   }
 
-  override def getUnitById(id: Int): Infantry = {
-    //TODO Should not be awaiting
-    val result = findById(Await.result(infantryCollection, Duration.Inf), id)
-    Await.result(result, Duration.Inf).get
+  override def getUnitById(id: Int): Future[Option[Infantry]] = {
+    val query = BSONDocument("id" -> id)
+    infantryCollection.flatMap{
+      _.find(query)
+        .one[Infantry]
+    }
   }
 
   override def getAllUnits: List[Infantry] = {
