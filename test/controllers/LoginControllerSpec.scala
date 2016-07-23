@@ -5,10 +5,12 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.Session
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import services.LoginService
 
 class LoginControllerSpec extends ControllerSpec with I18nSupport{
   implicit val messagesApi = application.injector.instanceOf[MessagesApi]
-  val controller = new LoginController
+  implicit val loginService = application.injector.instanceOf[LoginService]
+  val controller = new LoginController(loginService)
   val result = controller.login.apply(simpleRequest)
   val resultString = contentAsString(result)
 

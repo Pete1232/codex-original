@@ -1,11 +1,14 @@
 package forms
 
 import config.UnitSpec
+import services.MockLoginService
 
 class UserFormSpec extends UnitSpec{
 
+  val userForm = new UserForm(new MockLoginService).userForm
+
   def testForAnError(userId: String, password: String, errorId: String) = {
-    UserForm.userForm
+    userForm
       .bind(Map("userId" -> userId, "password" -> password))
       .errors
       .head
@@ -13,18 +16,18 @@ class UserFormSpec extends UnitSpec{
   }
 
   "userForm" must "validate a good userId/password combination" in {
-    UserForm.userForm.bind(Map("userId" -> "user", "password" -> "password"))
+    userForm.bind(Map("userId" -> "user", "password" -> "password"))
       .hasErrors mustBe false
   }
   it must "not validate an empty userId field" in {
-    val error = UserForm.userForm.bind(Map("userId" -> "", "password" -> ""))
+    val error = userForm.bind(Map("userId" -> "", "password" -> ""))
       .errors
       .head
     error.key mustBe "userId"
     error.message mustBe "error.required"
   }
   it must "not validate an empty password field" in {
-    val error = UserForm.userForm.bind(Map("userId" -> "user", "password" -> ""))
+    val error = userForm.bind(Map("userId" -> "user", "password" -> ""))
       .errors
       .head
     error.key mustBe "password"
@@ -37,7 +40,7 @@ class UserFormSpec extends UnitSpec{
     testForAnError("notAUser", "password", "login.validation.credentials")
   }
   it must "not validate userId or password if the userId is empty" in {
-    val errors = UserForm.userForm
+    val errors = userForm
       .bind(Map("userId" -> "", "password" -> "password"))
       .errors
     errors.foreach {error =>
@@ -46,7 +49,7 @@ class UserFormSpec extends UnitSpec{
     }
   }
   it must "not validate userId or password if the password is empty" in {
-    val errors = UserForm.userForm
+    val errors = userForm
       .bind(Map("userId" -> "user", "password" -> ""))
       .errors
     errors.foreach {error =>

@@ -3,9 +3,9 @@ package forms
 import models.User
 import play.api.data.Form
 import play.api.data.Forms._
-import services.MockLoginService
+import services.LoginService
 
-object UserForm {
+class UserForm(loginService: LoginService){
   val userForm = Form(
     mapping(
       "userId" -> nonEmptyText,
@@ -13,7 +13,7 @@ object UserForm {
     )(User.apply)(User.unapply)
         .verifying(
           "login.validation.credentials",
-          user => MockLoginService.validateUser(user)
+          user => loginService.validateUser(user)
         )
   )
 }
