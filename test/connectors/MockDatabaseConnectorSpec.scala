@@ -1,18 +1,19 @@
 package connectors
 
-import config.UnitSpec
+import config.AsyncUnitSpec
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class MockDatabaseConnectorSpec extends UnitSpec{
+class MockDatabaseConnectorSpec extends AsyncUnitSpec{
   val mockConnector = new MockDatabaseConnector
   val testDB = MockDatabase.db
-  "getUnitById" must "return the model for the unit that has the given id" in {
-    Await.result(mockConnector.getUnitById(112), Duration.Inf).get mustBe testDB("guardian")
-    Await.result(mockConnector.getUnitById(114), Duration.Inf).get mustBe testDB("windrider")
+  "getUnitById" must "return the model for a guardian if called with id 122" in {
+    mockConnector.getUnitById(112).map(_.get mustBe testDB("guardian"))
+  }
+  it must "return the model for a windrider if called with id 144" in {
+    mockConnector.getUnitById(114).map(_.get mustBe testDB("windrider"))
   }
   "getAllUnits" must "return a set of all units in the database" in {
-    Await.result(mockConnector.getAllUnits, Duration.Inf) mustBe testDB.values.toList
+    mockConnector.getAllUnits.map(_ mustBe testDB.values.toList)
   }
 }

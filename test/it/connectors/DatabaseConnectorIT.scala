@@ -1,23 +1,25 @@
 package it.connectors
 
-import config.UnitSpec
+import config.AsyncUnitSpec
 import connectors.DefaultDatabaseConnector
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
-
-class DatabaseConnectorIT extends UnitSpec{
+class DatabaseConnectorIT extends AsyncUnitSpec{
   val connector = new DefaultDatabaseConnector
   val expectedInfDBSize = 16
 
-  "getUnitById" must "return the model for the unit that has the given id" in {
-    Await.result(connector.getUnitById(112), Duration.Inf).get.name mustBe "Guardian Defenders"
-    Await.result(connector.getUnitById(123), Duration.Inf).get.name mustBe "Swooping Hawks"
+  "getUnitById" must "return the model for a guardian when called with id 112" in {
+    connector.getUnitById(112).map(_.get.name mustBe "Guardian Defenders")
+  }
+  it must "return the model for a hawk when called with id 123" in {
+    connector.getUnitById(123).map(_.get.name mustBe "Swooping Hawks")
   }
   "getAllUnits" must "return a set of all units in the database, ordered by id" in {
-    Await.result(connector.getAllUnits, Duration.Inf).size mustBe expectedInfDBSize
-    // test for expected first and last entries
-    Await.result(connector.getAllUnits, Duration.Inf).head.name mustBe "Guardian Defenders"
-    Await.result(connector.getAllUnits, Duration.Inf).last.name mustBe "Avatar of Khaine"
+    connector.getAllUnits.map(_.size mustBe expectedInfDBSize)
+  }
+  it should "have a guardian defender at the head of the list" in {
+    connector.getAllUnits.map(_.head.name mustBe "Guardian Defenders")
+  }
+  it should "have an avatar at the end of the list" in {
+    connector.getAllUnits.map(_.last.name mustBe "Avatar of Khaine")
   }
 }

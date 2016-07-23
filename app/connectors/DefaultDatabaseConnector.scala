@@ -5,8 +5,7 @@ import reactivemongo.api.{MongoConnection, MongoDriver, ReadPreference}
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 class DefaultDatabaseConnector extends DatabaseConnector{
   val mongoDriver: MongoDriver = new MongoDriver()
@@ -26,13 +25,6 @@ class DefaultDatabaseConnector extends DatabaseConnector{
     connection.database("codex").
       map(_.collection("infantry"))
 
-  def findAll(collection: BSONCollection): Future[List[Infantry]] = {
-    collection.find(BSONDocument())
-      .sort(BSONDocument("id" -> 1))
-      .cursor[Infantry](ReadPreference.Primary)
-      .collect[List]()
-  }
-
   override def getUnitById(id: Int): Future[Option[Infantry]] = {
     val query = BSONDocument("id" -> id)
     infantryCollection.flatMap{
@@ -42,6 +34,11 @@ class DefaultDatabaseConnector extends DatabaseConnector{
   }
 
   override def getAllUnits: Future[List[Infantry]] = {
-    findAll(Await.result(infantryCollection, Duration.Inf))
+    infantryCollection.flatMap{
+      _.find(BSONDocument())
+        .sort(BSONDocument("id" -> 1))
+        .cursor[Infantry](ReadPreference.Primary)
+        .collect[List]()
+    }
   }
 }
