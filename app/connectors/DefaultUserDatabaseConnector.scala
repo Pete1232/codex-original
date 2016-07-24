@@ -41,10 +41,10 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
         .map {
           _ match {
             case Some(foundUser) => {
-              Logger.debug("User found - no further action")
+              Logger.debug(s"User ${foundUser.userId} found - no further action")
             }
             case None => {
-              Logger.debug("No user found - creating new user")
+              Logger.debug(s"No user ${user.userId} found - creating new user")
               users.insert(BSONDocument("userId" -> user.userId, "password" -> user.password))
             }
           }
