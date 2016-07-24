@@ -41,5 +41,5 @@ def unitFilter(name: String): Boolean = name endsWith "Spec"
 
 // test coverage config
 coverageExcludedPackages := """controllers\..*Reverse.*;router.Routes.*;views.html.*;"""
-coverageMinimum := 95
+coverageMinimum := 99
 coverageFailOnMinimum := true

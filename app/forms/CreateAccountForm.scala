@@ -10,5 +10,8 @@ class CreateAccountForm {
       "userId" -> nonEmptyText,
       "password" -> nonEmptyText
     )(User.apply)(User.unapply)
+      .verifying(
+        User.passwordCheckConstraint
+      )
   )
 }

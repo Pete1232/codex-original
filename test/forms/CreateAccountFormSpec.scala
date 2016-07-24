@@ -17,4 +17,22 @@ class CreateAccountFormSpec extends UnitSpec{
     accountForm.bind(Map("userId" -> "user", "password" -> "password"))
       .hasErrors mustBe false
   }
+  it must "not validate an empty userId field" in {
+    val error = accountForm.bind(Map("userId" -> "", "password" -> ""))
+      .errors
+      .head
+    error.key mustBe "userId"
+    error.message mustBe "error.required"
+  }
+  it must "not validate an empty password field" in {
+    val error = accountForm.bind(Map("userId" -> "user", "password" -> ""))
+      .errors
+      .head
+    error.key mustBe "password"
+    error.message mustBe "error.required"
+  }
+  it must "not validate a password that is too short" in {
+    testForAnError("user", "pass", "login.validation.length")
+  }
+
 }
