@@ -3,6 +3,7 @@ import models.User
 import play.Logger
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.commands.{UpdateWriteResult, WriteResult}
+import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -23,6 +24,7 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
     connection.database("codex").
       map(_.collection("users"))
 
+
   override def validatePasswordForUser(user: User): Future[Boolean] = {
     userCollection.flatMap{
       _.find(BSONDocument("userId" -> user.userId.toLowerCase))
@@ -37,10 +39,9 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
   override def createNewUser(user: User): Future[User] = {
     val formattedUserId = user.userId.toLowerCase
     userCollection.flatMap { users =>
-      users.update(
-        BSONDocument("userId" -> formattedUserId),
-        BSONDocument("userId" -> formattedUserId, "password" -> user.password),
-        upsert = true
+      users.indexesManager.ensure(Index(Seq("userId" -> IndexType.Text), unique = true))
+      users.insert(
+        BSONDocument("userId" -> formattedUserId, "password" -> user.password)
       )
     }.map{success =>
       Logger.debug(s"process completed with result $success")
