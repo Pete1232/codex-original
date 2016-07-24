@@ -36,7 +36,7 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
     }
   }
 
-  override def createNewUser(user: User): Future[User] = {
+  override def createNewUser(user: User): Future[WriteResult] = {
     val formattedUserId = user.userId.toLowerCase
     userCollection.flatMap { users =>
       users.indexesManager.ensure(Index(Seq("userId" -> IndexType.Text), unique = true))
@@ -45,7 +45,7 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
       )
     }.map{success =>
       Logger.debug(s"process completed with result $success")
-      User(formattedUserId, user.password)
+      success
     }
   }
 

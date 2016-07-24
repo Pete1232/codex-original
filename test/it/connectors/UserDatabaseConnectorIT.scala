@@ -4,6 +4,8 @@ import config.AsyncUnitSpec
 import connectors.DefaultUserDatabaseConnector
 import models.User
 import org.scalatest.BeforeAndAfter
+import reactivemongo.api.commands.LastError
+import reactivemongo.core.errors.DatabaseException
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
@@ -16,18 +18,21 @@ class UserDatabaseConnectorIT extends AsyncUnitSpec with BeforeAndAfter{
     Await.ready(connector.createNewUser(User("user", "password")), Duration.Inf)
   }
 
-  "createNewUser" must "return the user after saving successfully" in {
+  "createNewUser" must "return a successful write result after saving successfully" in {
+    Await.ready(connector.clearUserFromDatabase(User("user", "password")), Duration.Inf)
     connector.createNewUser(User("user", "password"))
-      .map(_ mustBe User("user", "password"))
+      .map(_.ok mustBe true)
+  }
+  it must "fail if attempting to create a user that already exists" in {
+    val con = connector.createNewUser(User("user", "password"))
+    recoverToExceptionIf[LastError](con).map{ e =>
+      e.errmsg.get must include ("duplicate key error")
+    }
   }
   it must "not be case sensetive for the userId" in {
-    val user1 = connector.createNewUser(User("user", "password"))
-    val user2 = connector.createNewUser(User("USER", "password"))
-    val user3 = connector.createNewUser(User("UsER", "password"))
-    val users = Seq(user1, user2, user3)
-
-    Future.sequence(users).map{
-      _ mustBe Seq(User("user", "password"), User("user", "password"), User("user", "password"))
+    val con = connector.createNewUser(User("UsER", "password"))
+    recoverToExceptionIf[LastError](con).map{ e =>
+      e.errmsg.get must include ("duplicate key error")
     }
   }
 

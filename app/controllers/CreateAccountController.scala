@@ -28,9 +28,9 @@ class CreateAccountController @Inject()(userDatabaseConnector: UserDatabaseConne
         Logger.debug(s"Creating user ${userData.userId}")
         userDatabaseConnector
           .createNewUser(userData)
-          .map { savedUser =>
+          .map { writeResult =>
             Redirect(routes.HomeController.home)
-              .withSession("userId" -> savedUser.userId)
+              .withSession("userId" -> userData.userId)
           }
           .recover{
             case e: Exception => {

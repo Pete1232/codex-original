@@ -20,9 +20,9 @@ class MockUserDatabaseConnectorSpec extends AsyncUnitSpec with ScalaFutures{
     mockConnector.validatePasswordForUser(User("notAUser", "password"))
       .map(_ mustBe false)
   }
-  "createNewUser" must "return the given user" in {
+  "createNewUser" must "return a successful save result" in {
     mockConnector.createNewUser(User("user", "password"))
-      .map(_ mustBe User("user", "password"))
+      .map(_.ok mustBe true)
   }
   it must "fail for userId 'fail' with a BadRequest exception" in {
     val result = mockConnector.createNewUser(User("fail", "password"))
