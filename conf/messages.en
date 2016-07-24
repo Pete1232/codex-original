@@ -1,4 +1,5 @@
 login.validation.length=Passwords must contain more than 5 characters
 login.validation.credentials=The userId and password you entered do not match
 login.validation.userId=The userId you entered does not exist
+login.validation.userExists=The userId you entered already exists
 error.required=The {0} field is required

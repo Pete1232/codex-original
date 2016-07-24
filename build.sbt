@@ -9,13 +9,12 @@ lazy val codex = (project in file("."))
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.testTasks) : _*)
   .settings(
-    testOptions in Test := Seq(Tests.Filter(unitFilter)),
+    testOptions in UnitTest := Seq(Tests.Filter(unitFilter)),
     testOptions in IntegrationTest := Seq(Tests.Filter(itFilter))
   )
   .settings(
-    javaOptions in Test +="-Dlogger.resource=logback-test.xml"
-  )
-  .settings(
+    javaOptions in Test +="-Dlogger.resource=logback-test.xml",
+    javaOptions in UnitTest +="-Dlogger.resource=logback-test.xml",
     javaOptions in IntegrationTest +="-Dlogger.resource=logback-test.xml"
   )
 
@@ -34,6 +33,7 @@ lazy val testDependencies = Seq(
   "org.scalatest" %% "scalatest" % "3.0.0-RC4" % "test"
 )
 
+lazy val UnitTest = config("unit") extend(Test)
 lazy val IntegrationTest = config("it") extend(Test)
 
 def itFilter(name: String): Boolean = name endsWith "IT"
