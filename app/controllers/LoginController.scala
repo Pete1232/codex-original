@@ -18,10 +18,12 @@ class LoginController @Inject()(loginService: LoginService)(implicit webJarAsset
   val loginPost = Action{implicit request =>
     userForm.bindFromRequest.fold(
       formWithErrors => {
+        Logger.debug("Error creating form")
         formWithErrors.errors.foreach(error => Logger.info(s"Validation error on field ${error.messages}"))
         BadRequest(views.html.login(formWithErrors))
       },
       userData => {
+        Logger.debug(s"Login successful ${userData.userId}")
         Redirect(routes.HomeController.home)
           .withSession("userId" -> userData.userId)
       }

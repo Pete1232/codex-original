@@ -20,10 +20,12 @@ class CreateAccountController @Inject()(userDatabaseConnector: UserDatabaseConne
   val createPost = Action.async { implicit request =>
     accountForm.bindFromRequest.fold(
       formWithErrors => {
+        Logger.debug("Error creating form")
         formWithErrors.errors.foreach(error => Logger.info(s"Validation error on field ${error.messages}"))
         Future.successful(BadRequest(views.html.create(formWithErrors)))
       },
       userData => {
+        Logger.debug(s"Creating user ${userData.userId}")
         userDatabaseConnector
           .createNewUser(userData)
           .map { savedUser =>
@@ -31,7 +33,10 @@ class CreateAccountController @Inject()(userDatabaseConnector: UserDatabaseConne
               .withSession("userId" -> savedUser.userId)
           }
           .recover{
-            case e: Exception => Redirect(routes.ErrorController.error)
+            case e: Exception => {
+              Logger.error(s"Exception $e during user creation")
+              Redirect(routes.ErrorController.error)
+            }
           }
       }
     )
