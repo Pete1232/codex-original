@@ -2,7 +2,7 @@ package connectors
 import models.User
 import play.Logger
 import reactivemongo.api.collections.bson.BSONCollection
-import reactivemongo.api.commands.WriteResult
+import reactivemongo.api.commands.{UpdateWriteResult, WriteResult}
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -25,7 +25,7 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
 
   override def validatePasswordForUser(user: User): Future[Boolean] = {
     userCollection.flatMap{
-      _.find(BSONDocument("userId" -> user.userId))
+      _.find(BSONDocument("userId" -> user.userId.toLowerCase))
         .one[User]
     }.map{ _ match {
         case Some(foundUser) => foundUser.password == user.password
@@ -35,15 +35,16 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
   }
 
   override def createNewUser(user: User): Future[User] = {
-
+    val formattedUserId = user.userId.toLowerCase
     userCollection.flatMap { users =>
       users.update(
-        BSONDocument("userId" -> user.userId),
-        BSONDocument("userId" -> user.userId, "password" -> user.password),
+        BSONDocument("userId" -> formattedUserId),
+        BSONDocument("userId" -> formattedUserId, "password" -> user.password),
         upsert = true
       )
     }.map{success =>
-      user
+      Logger.debug(s"process completed with result $success")
+      User(formattedUserId, user.password)
     }
   }
 
