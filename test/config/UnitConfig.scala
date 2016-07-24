@@ -1,6 +1,6 @@
 package config
 
-import connectors.{DatabaseConnector, MockDatabaseConnector}
+import connectors.{DatabaseConnector, MockDatabaseConnector, MockUserDatabaseConnector, UserDatabaseConnector}
 import controllers.WebJarAssets
 import org.scalatest.{AsyncFlatSpec, FlatSpec, MustMatchers}
 import play.api.inject._
@@ -17,6 +17,7 @@ abstract class ControllerSpec extends UnitSpec with Results {
   val controller: Controller
   val application = new GuiceApplicationBuilder()
     .overrides(bind[DatabaseConnector].to[MockDatabaseConnector])
+    .overrides(bind[UserDatabaseConnector].to[MockUserDatabaseConnector])
     .overrides(bind[LoginService].to[MockLoginService])
     .build()
   implicit val webJarAssets = application.injector.instanceOf[WebJarAssets]

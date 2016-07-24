@@ -1,6 +1,7 @@
 package controllers
 
 import config.ControllerSpec
+import connectors.UserDatabaseConnector
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.Session
 import play.api.test.FakeRequest
@@ -8,7 +9,8 @@ import play.api.test.Helpers._
 
 class CreateAccountControllerSpec extends ControllerSpec with I18nSupport{
   implicit val messagesApi = application.injector.instanceOf[MessagesApi]
-  val controller = new CreateAccountController
+  val mockUserDatabaseConnector = application.injector.instanceOf[UserDatabaseConnector]
+  val controller = new CreateAccountController(mockUserDatabaseConnector)
   val result = controller.create.apply(simpleRequest)
   val resultString = contentAsString(result)
 
@@ -39,7 +41,7 @@ class CreateAccountControllerSpec extends ControllerSpec with I18nSupport{
     status(createSuccessResult) mustBe 303
     session(createSuccessResult) mustBe (Session(Map("userId" -> "user")))
   }
-  it must "redirect to the page with errors if the save failed" ignore running(application){
+  it must "redirect to the page with errors if the save failed" in running(application){
     val createFailedResult = controller.createPost
       .apply(FakeRequest.apply()
         .withFormUrlEncodedBody(
