@@ -1,15 +1,13 @@
 package connectors
 import models.{CombatRole, Infantry}
+import reactivemongo.api.ReadPreference
 import reactivemongo.api.collections.bson.BSONCollection
-import reactivemongo.api.{MongoConnection, MongoDriver, ReadPreference}
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DefaultDatabaseConnector extends DatabaseConnector{
-  val mongoDriver: MongoDriver = new MongoDriver()
-  val connection: MongoConnection = mongoDriver.connection(List("localhost"))
 
   implicit object InfantryReader extends BSONDocumentReader[Infantry] {
     def read(doc: BSONDocument): Infantry = {
