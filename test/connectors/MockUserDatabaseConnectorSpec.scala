@@ -2,8 +2,9 @@ package connectors
 
 import config.AsyncUnitSpec
 import models.User
+import org.scalatest.concurrent.ScalaFutures
 
-class MockUserDatabaseConnectorSpec extends AsyncUnitSpec{
+class MockUserDatabaseConnectorSpec extends AsyncUnitSpec with ScalaFutures{
   val mockConnector = new MockUserDatabaseConnector
   val testDB = MockDatabase.db
   "validatePasswordForUser" must "return true if the password was correct" in {
@@ -18,5 +19,15 @@ class MockUserDatabaseConnectorSpec extends AsyncUnitSpec{
   it must "return false if the user was not found in the database" in {
     mockConnector.validatePasswordForUser(User("notAUser", "password"))
       .map(_ mustBe false)
+  }
+  "createNewUser" must "return the given user" in {
+    mockConnector.createNewUser(User("user", "password"))
+      .map(_ mustBe User("user", "password"))
+  }
+  it must "fail for userId 'fail' with a BadRequest exception" in {
+    val result = mockConnector.createNewUser(User("fail", "password"))
+    ScalaFutures.whenReady(result.failed){ e =>
+      e mustBe a[Exception]
+    }
   }
 }

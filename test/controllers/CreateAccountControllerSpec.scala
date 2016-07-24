@@ -29,7 +29,7 @@ class CreateAccountControllerSpec extends ControllerSpec with I18nSupport{
     resultString must include(Messages("error.required", "userId"))
     resultString must include(Messages("error.required", "password"))
   }
-  it must "redirect to home with a session cookie after post" in running(application) {
+  it must "redirect to home with a session cookie if the save succeeded" in running(application) {
     val createSuccessResult = controller.createPost
       .apply(FakeRequest.apply()
         .withFormUrlEncodedBody(
@@ -38,5 +38,15 @@ class CreateAccountControllerSpec extends ControllerSpec with I18nSupport{
         ))
     status(createSuccessResult) mustBe 303
     session(createSuccessResult) mustBe (Session(Map("userId" -> "user")))
+  }
+  it must "redirect to the page with errors if the save failed" ignore running(application){
+    val createFailedResult = controller.createPost
+      .apply(FakeRequest.apply()
+        .withFormUrlEncodedBody(
+          "userId" -> "fail",
+          "password" -> "password"
+        ))
+    status(createFailedResult) mustBe 303
+    redirectLocation(createFailedResult).get mustBe ("/error")
   }
 }

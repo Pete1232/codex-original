@@ -10,4 +10,11 @@ class MockUserDatabaseConnector extends UserDatabaseConnector{
       .applyOrElse(user.userId, (s: String) => "") == user.password
     )
   }
+
+  override def createNewUser(user: User): Future[User] = {
+    user.userId match {
+      case "fail" => Future.failed(new Exception)
+      case _ => Future.successful(user)
+    }
+  }
 }
