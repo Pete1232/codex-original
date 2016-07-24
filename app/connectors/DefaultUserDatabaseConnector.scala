@@ -35,20 +35,13 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
   }
 
   override def createNewUser(user: User): Future[User] = {
+
     userCollection.flatMap { users =>
-      users.find(BSONDocument("userId" -> user.userId))
-        .one[User]
-        .map {
-          _ match {
-            case Some(foundUser) => {
-              Logger.debug(s"User ${foundUser.userId} found - no further action")
-            }
-            case None => {
-              Logger.debug(s"No user ${user.userId} found - creating new user")
-              users.insert(BSONDocument("userId" -> user.userId, "password" -> user.password))
-            }
-          }
-        }
+      users.update(
+        BSONDocument("userId" -> user.userId),
+        BSONDocument("userId" -> user.userId, "password" -> user.password),
+        upsert = true
+      )
     }.map{success =>
       user
     }
