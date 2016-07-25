@@ -3,7 +3,6 @@ package it.connectors
 import config.AsyncUnitSpec
 import connectors.DefaultUserDatabaseConnector
 import models.User
-import org.apache.commons.codec.BinaryEncoder
 import org.apache.commons.codec.binary.Hex
 import org.scalatest.BeforeAndAfter
 import reactivemongo.api.commands.LastError

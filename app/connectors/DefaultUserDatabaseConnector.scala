@@ -1,9 +1,10 @@
 package connectors
 import java.security.SecureRandom
+import java.util.Arrays
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 
-import models.User
+import models.{DatabaseUser, User}
 import play.Logger
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.commands.WriteResult
@@ -15,12 +16,13 @@ import scala.concurrent.Future
 
 class DefaultUserDatabaseConnector extends UserDatabaseConnector{
 
-  implicit object InfantryReader extends BSONDocumentReader[User] {
-    def read(doc: BSONDocument): User = {
+  implicit object InfantryReader extends BSONDocumentReader[DatabaseUser] {
+    def read(doc: BSONDocument): DatabaseUser = {
       val userId = doc.getAs[String]("userId").get
-      val password = doc.getAs[String]("password").get
+      val password = doc.getAs[Array[Byte]]("password").get
+      val salt = doc.getAs[Array[Byte]]("salt").get
 
-      User(userId, password)
+      DatabaseUser(userId, password, salt)
     }
   }
 
@@ -32,9 +34,14 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
   override def validatePasswordForUser(user: User): Future[Boolean] = {
     userCollection.flatMap{
       _.find(BSONDocument("userId" -> user.userId.toLowerCase))
-        .one[User]
+        .one[DatabaseUser]
     }.map{ _ match {
-        case Some(foundUser) => foundUser.password == user.password
+        case Some(storedUser) => {
+          Arrays.equals(
+            storedUser.password,
+            hashPassword(user.password, storedUser.salt)
+          )
+        }
         case None => false
       }
     }
@@ -43,10 +50,14 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
   override def createNewUser(user: User): Future[WriteResult] = {
     val formattedUserId = user.userId.toLowerCase
     userCollection.flatMap { users =>
+      val salt = generateSalt
       users.indexesManager.ensure(Index(Seq("userId" -> IndexType.Text), unique = true))
       users.insert(
         BSONDocument(
-          "userId" -> formattedUserId, "password" -> user.password)
+          "userId" -> formattedUserId,
+          "password" -> hashPassword(user.password, salt),
+          "salt" -> salt
+        )
       )
     }.map{success =>
       Logger.debug(s"process completed with result $success")
@@ -54,16 +65,19 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
     }
   }
 
-  def hashPassword(password: String, salt: Array[Byte], iterations: Int = 4096, keyLength: Int = 256): Array[Byte] =
+  def hashPassword(password: String, salt: Array[Byte], iterations: Int = 4096, keyLength: Int = 256): Array[Byte] = {
+    Logger.debug("Hashing password")
     SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512")
       .generateSecret(
         new PBEKeySpec(password.toCharArray, salt, iterations, keyLength)
       ).getEncoded
+  }
 
   def generateSalt: Array[Byte] = {
+    Logger.debug("Generating new salt")
     val byteArray: Array[Byte] = new Array(8)
     new SecureRandom()
-      .nextBytes(new Array(8))
+      .nextBytes(byteArray)
     byteArray
   }
 
@@ -71,6 +85,7 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
     * For use in testing
     */
   def clearUserFromDatabase(user: User): Future[WriteResult] = {
+    Logger.debug(s"Clearing user ${user.userId} from database")
     userCollection.flatMap{
       _.remove(BSONDocument("userId" -> "user"))
     }
