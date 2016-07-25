@@ -54,7 +54,7 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
     }
   }
 
-  def hashPassword(password: String, salt: Array[Byte], iterations: Int, keyLength: Int): Array[Byte] =
+  def hashPassword(password: String, salt: Array[Byte], iterations: Int = 4096, keyLength: Int = 256): Array[Byte] =
     SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512")
       .generateSecret(
         new PBEKeySpec(password.toCharArray, salt, iterations, keyLength)
