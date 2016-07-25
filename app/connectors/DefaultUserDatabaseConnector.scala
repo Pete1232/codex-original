@@ -1,4 +1,5 @@
 package connectors
+import java.security.SecureRandom
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 
@@ -44,7 +45,8 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
     userCollection.flatMap { users =>
       users.indexesManager.ensure(Index(Seq("userId" -> IndexType.Text), unique = true))
       users.insert(
-        BSONDocument("userId" -> formattedUserId, "password" -> user.password)
+        BSONDocument(
+          "userId" -> formattedUserId, "password" -> user.password)
       )
     }.map{success =>
       Logger.debug(s"process completed with result $success")
@@ -52,11 +54,18 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
     }
   }
 
-  def hashPassword(password: String, salt: String, iterations: Int, keyLength: Int): Array[Byte] =
+  def hashPassword(password: String, salt: Array[Byte], iterations: Int, keyLength: Int): Array[Byte] =
     SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512")
       .generateSecret(
-        new PBEKeySpec(password.toCharArray, salt.getBytes, iterations, keyLength)
+        new PBEKeySpec(password.toCharArray, salt, iterations, keyLength)
       ).getEncoded
+
+  def generateSalt: Array[Byte] = {
+    val byteArray: Array[Byte] = new Array(8)
+    new SecureRandom()
+      .nextBytes(new Array(8))
+    byteArray
+  }
 
   /**
     * For use in testing
