@@ -3,11 +3,11 @@ package it.connectors
 import config.AsyncUnitSpec
 import connectors.DefaultUserDatabaseConnector
 import models.User
+import org.apache.commons.codec.binary.Hex
 import org.scalatest.BeforeAndAfter
 import reactivemongo.api.commands.LastError
-import reactivemongo.core.errors.DatabaseException
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 class UserDatabaseConnectorIT extends AsyncUnitSpec with BeforeAndAfter{
@@ -51,5 +51,14 @@ class UserDatabaseConnectorIT extends AsyncUnitSpec with BeforeAndAfter{
   it must "not be case sensetive for the userId" in {
     connector.validatePasswordForUser(User("USER", "password"))
       .map(_ mustBe true)
+  }
+
+  "hashPassword" must "hash the given string using PBKDF2WithHmacSHA512" in {
+    Hex.encodeHexString(connector.hashPassword("password", "salt", 1, 512))
+      .mustBe("867f70cf1ade02cff3752599a3a53dc4af34c7a669815ae5d513554e1c8cf252c02d470a285a0501bad999bfe943c08f050235d7d68b1da55e63f73b60a57fce")
+    Hex.encodeHexString(connector.hashPassword("password", "salt", 2, 64))
+      .mustBe("e1d9c16aa681708a")
+    Hex.encodeHexString(connector.hashPassword("password", "salt", 4096, 64))
+      .mustBe("d197b1b33db0143e")
   }
 }

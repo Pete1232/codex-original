@@ -1,8 +1,11 @@
 package connectors
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.PBEKeySpec
+
 import models.User
 import play.Logger
 import reactivemongo.api.collections.bson.BSONCollection
-import reactivemongo.api.commands.{UpdateWriteResult, WriteResult}
+import reactivemongo.api.commands.WriteResult
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader}
 
@@ -48,6 +51,12 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
       success
     }
   }
+
+  def hashPassword(password: String, salt: String, iterations: Int, keyLength: Int): Array[Byte] =
+    SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512")
+      .generateSecret(
+        new PBEKeySpec(password.toCharArray, salt.getBytes, iterations, keyLength)
+      ).getEncoded
 
   /**
     * For use in testing
