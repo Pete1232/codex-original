@@ -13,10 +13,10 @@ class ArmyControllerIT extends ControllerIT{
     status(result) mustBe 200
     contentAsString(result) must include("<title>Army Roster</title>")
   }
-  it should "contain a div for each infantry in the database" in {
+  it should "contain a link for each infantry in the database" in {
     val result = controller.displayArmyList.apply(simpleRequest)
     // test first and last value
-    contentAsString(result) must include(s"<div>Guardian Defenders</div>")
-    contentAsString(result) must include(s"<div>Avatar of Khaine</div>")
+    contentAsString(result) must include regex(s"""(<a href="/army/112")(.*)(Guardian Defenders</a>)""".r)
+    contentAsString(result) must include regex(s"""(<a href="/army/137")(.*)(Avatar of Khaine</a>)""".r)
   }
 }

@@ -12,10 +12,10 @@ class ArmyControllerSpec extends ControllerSpec{
     status(result) mustBe 200
     contentAsString(result) must include("<title>Army Roster</title>")
   }
-  it should "contain a div for each infantry in the database" in {
+  it should "contain a link for each infantry in the database" in {
     val result = controller.displayArmyList.apply(simpleRequest)
     testDB.values.map {infantry =>
-      contentAsString(result) must include(s"<div>${infantry.name}</div>")
+      contentAsString(result) must include regex(s"""(<a href="/army/${infantry.id})(.*)(${infantry.name}</a>)""".r)
     }
   }
 }

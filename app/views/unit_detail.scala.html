@@ -1,7 +1,19 @@
 @(infantry: Infantry)(implicit webJarAssets: WebJarAssets)
 @main("Unit detail")("Unit detail")(""){
-<div id="details">
-    <div id="name">@infantry.name</div>
-    <div id="role">@infantry.role</div>
-</div>
+    <div id="details" class="panel panel-default">
+        <div class="panel-heading">
+            <h3 id="name" class="panel-title">@infantry.name</h3>
+        </div>
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th scope="row">Combat Role</th>
+                    <td>@infantry.role</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <a onclick="window.history.back()" class="btn btn-default" role="button">Back</a>
+    </div>
 }
