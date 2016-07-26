@@ -20,7 +20,7 @@ class LoginControllerSpec extends ControllerSpec with I18nSupport{
   }
   it must "display the login form" in {
     val resultString = contentAsString(result)
-    resultString must include regex("""(<form)(.*)(id="loginForm">)""".r)
+    resultString must include regex("""(<form)(.*)(id="loginForm")""".r)
     resultString must include("<input type=\"text\" id=\"userId\" name=\"userId\"")
     resultString must include("<input type=\"text\" id=\"password\" name=\"password\"")
   }

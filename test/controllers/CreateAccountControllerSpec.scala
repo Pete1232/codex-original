@@ -20,7 +20,7 @@ class CreateAccountControllerSpec extends ControllerSpec with I18nSupport{
   }
   it must "display the create account form" in {
     val resultString = contentAsString(result)
-    resultString must include regex("""(<form)(.*)(id="createAccountForm">)""".r)
+    resultString must include regex("""(<form)(.*)(id="createAccountForm")""".r)
     resultString must include("<input type=\"text\" id=\"userId\" name=\"userId\"")
     resultString must include("<input type=\"text\" id=\"password\" name=\"password\"")
   }
