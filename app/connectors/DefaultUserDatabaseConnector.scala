@@ -87,7 +87,7 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
   def clearUserFromDatabase(user: User): Future[WriteResult] = {
     Logger.debug(s"Clearing user ${user.userId} from database")
     userCollection.flatMap{
-      _.remove(BSONDocument("userId" -> "user"))
+      _.remove(BSONDocument("userId" -> user.userId.toLowerCase()))
     }
   }
 }

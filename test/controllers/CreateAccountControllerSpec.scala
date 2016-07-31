@@ -36,7 +36,7 @@ class CreateAccountControllerSpec extends ControllerSpec with I18nSupport{
       .apply(FakeRequest.apply()
         .withFormUrlEncodedBody(
           "userId" -> "user",
-          "password" -> "password"
+          "password" -> "p2Ssword"
         ))
     status(createSuccessResult) mustBe 303
     session(createSuccessResult) mustBe (Session(Map("userId" -> "user")))
@@ -46,13 +46,23 @@ class CreateAccountControllerSpec extends ControllerSpec with I18nSupport{
       .apply(FakeRequest.apply()
         .withFormUrlEncodedBody(
           "userId" -> "fail",
-          "password" -> "password"
+          "password" -> "p2Ssword"
         ))
     status(createFailedResult) mustBe 303
     redirectLocation(createFailedResult).get mustBe ("/error")
   }
-  it must "display the password strength tips" in {
-    resultString must include(Messages("login.validation.topology.help.header"))
-    resultString must include(Messages("login.validation.topology.help.content"))
+  it must "display the password strength tips if the password was blacklisted" in {
+    val createBadTopologyResult = controller.createPost
+      .apply(FakeRequest.apply()
+        .withFormUrlEncodedBody(
+          "userId" -> "fail",
+          "password" -> "password"
+        ))
+    contentAsString(createBadTopologyResult) must include(Messages("login.validation.topology.help.header"))
+    contentAsString(createBadTopologyResult) must include(Messages("login.validation.topology.help.content"))
+  }
+  it must "not display the password strength tips otherwise" in {
+    resultString must not include(Messages("login.validation.topology.help.header"))
+    resultString must not include(Messages("login.validation.topology.help.content"))
   }
 }

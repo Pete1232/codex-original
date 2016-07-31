@@ -14,7 +14,7 @@ class CreateAccountFormSpec extends UnitSpec{
   }
 
   "accountForm" must "validate a good userId/password combination" in {
-    accountForm.bind(Map("userId" -> "user", "password" -> "password"))
+    accountForm.bind(Map("userId" -> "user", "password" -> "p2Ssword"))
       .hasErrors mustBe false
   }
   it must "not validate an empty userId field" in {
@@ -34,5 +34,10 @@ class CreateAccountFormSpec extends UnitSpec{
   it must "not validate a password that is too short" in {
     testForAnError("user", "pass", "login.validation.length")
   }
-
+  it must "requre a valid password topology" in {
+    val error = accountForm.bind(Map("userId" -> "user", "password" -> "password"))
+      .errors
+      .head
+    error.message mustBe "login.validation.topology"
+  }
 }

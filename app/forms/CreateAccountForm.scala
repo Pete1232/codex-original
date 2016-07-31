@@ -3,6 +3,7 @@ package forms
 import models.User
 import play.api.data.Form
 import play.api.data.Forms._
+import services.TopologyParser
 
 class CreateAccountForm {
   val form = Form(
@@ -12,6 +13,9 @@ class CreateAccountForm {
     )(User.apply)(User.unapply)
       .verifying(
         User.passwordCheckConstraint
+      )
+      .verifying(
+        TopologyParser.passwordCheckConstraint
       )
   )
 }

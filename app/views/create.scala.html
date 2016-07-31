@@ -14,13 +14,17 @@
         <p>Please correct the following:</p>
         <ul>
             @accountForm.errors.map { error =>
-            <li>@Messages(error.message, error.key)</li>
+                @error.message match {
+                    case "login.validation.topology" => { <li>@Messages(error.message, error.key)</li>
+                        <div class="alert-message error">
+                            <h4>@Messages("login.validation.topology.help.header")</h4>
+                            <p style="font-size:14px;">@Messages("login.validation.topology.help.content")</p>
+                        </div>
+                }
+                    case _ => { <li>@Messages(error.message, error.key)</li> }
+                }
             }
         </ul>
     </div>
     }
-    <div class="alert-message error">
-        <h4>@Messages("login.validation.topology.help.header")</h4>
-        <p style="font-size:14px;">@Messages("login.validation.topology.help.content")</p>
-    </div>
 }
