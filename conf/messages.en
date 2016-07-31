@@ -2,4 +2,7 @@ login.validation.length=Passwords must contain more than 5 characters
 login.validation.credentials=The userId and password you entered do not match
 login.validation.userId=The userId you entered does not exist
 login.validation.userExists=The userId you entered already exists
+login.validation.topology=The password you entered is too predictable. See below for help.
+login.validation.topology.help.header=Why is my password too predictable?
+login.validation.topology.help.content=Most passwords that people choose fall in to one of a few simple patterns. If you see this message it means your password matched one of the most common patterns and would be too easy for an attacker to guess. Maybe shuffle around the password you just entered, mixing up the letters, numbers and other symbols. It is much better to have a complicated password written down than to memorize a simple one!
 error.required=The {0} field is required

@@ -51,4 +51,8 @@ class CreateAccountControllerSpec extends ControllerSpec with I18nSupport{
     status(createFailedResult) mustBe 303
     redirectLocation(createFailedResult).get mustBe ("/error")
   }
+  it must "display the password strength tips" in {
+    resultString must include(Messages("login.validation.topology.help.header"))
+    resultString must include(Messages("login.validation.topology.help.content"))
+  }
 }
