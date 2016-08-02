@@ -33,12 +33,6 @@ class UserFormSpec extends UnitSpec{
     error.key mustBe "password"
     error.message mustBe "error.required"
   }
-  it must "not validate bad credentials" in {
-    testForAnError("user", "p2ssword", "login.validation.credentials")
-  }
-  it must "not validate a userId that does not exist in the database" in {
-    testForAnError("notAUser", "password", "login.validation.credentials")
-  }
   it must "not validate userId or password if the userId is empty" in {
     val errors = userForm
       .bind(Map("userId" -> "", "password" -> "password"))
