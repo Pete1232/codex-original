@@ -10,6 +10,9 @@ class UserForm(loginService: LoginService){
     mapping(
       "userId" -> nonEmptyText,
       "password" -> nonEmptyText
-    )(User.apply)(User.unapply)
+    )(User.apply)
+    // $COVERAGE-OFF$
+    (User.unapply)
+    // $COVERAGE-ON$
   )
 }

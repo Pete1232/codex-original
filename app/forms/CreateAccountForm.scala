@@ -14,7 +14,10 @@ class CreateAccountForm {
       "password" -> nonEmptyText
         .verifying(passwordLengthConstraint)
         .verifying(passwordTopologyConstraint)
-    )(User.apply)(User.unapply)
+    )(User.apply)
+      // $COVERAGE-OFF$
+      (User.unapply)
+      // $COVERAGE-ON$
   )
 }
 

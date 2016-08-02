@@ -1,6 +1,6 @@
 name := "Codex"
 
-version := "0.1.0"
+version := "999-SNAPSHOT"
 
 scalaVersion := "2.11.8"
 
@@ -41,5 +41,5 @@ def unitFilter(name: String): Boolean = name endsWith "Spec"
 
 // test coverage config
 coverageExcludedPackages := """controllers\..*Reverse.*;router.Routes.*;views.html.*;"""
-coverageMinimum := 99
+coverageMinimum := 100
 coverageFailOnMinimum := true
