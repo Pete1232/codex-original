@@ -10,6 +10,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class AccountController @Inject()(userDatabaseConnector: UserDatabaseConnector)(implicit webJarAssets: WebJarAssets) extends Controller{
+  Logger.debug("Loading user details page")
   def displayUserDetails = Action { implicit request =>
     request2session.get("userId") match {
       case Some(userId) => Ok(views.html.account(userId))
@@ -18,10 +19,12 @@ class AccountController @Inject()(userDatabaseConnector: UserDatabaseConnector)(
   }
 
   def deleteUser = Action.async { implicit request =>
+    Logger.debug("Deleting current user from db")
     request2session.get("userId") match {
       case Some(userId) => {
         userDatabaseConnector.deleteUser(User(userId, ""))
           .map { success =>
+            Logger.debug("User deleted successfully - removing session cookie")
             Redirect(routes.LogoutController.logout)
           }
           .recover{

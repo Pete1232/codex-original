@@ -6,6 +6,7 @@ GET     /sign-up                    controllers.CreateAccountController.create
 POST    /sign-up                    controllers.CreateAccountController.createPost
 GET     /logout                     controllers.LogoutController.logout
 GET     /account                    controllers.AccountController.displayUserDetails
+POST    /delete                     controllers.AccountController.deleteUser
 GET     /error                      controllers.ErrorController.error
 GET     /army                       controllers.ArmyController.displayArmyList
 GET     /army/:id                   controllers.UnitController.displayUnitDetails(id: Int)

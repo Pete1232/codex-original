@@ -1,6 +1,13 @@
+@import helper._
+
 @(userId: String)(implicit webJarAssets: WebJarAssets)
 @main("Your Account")("Your Account")("View your account details"){
     <div id="userId">
         Your user identification code is <b>@userId</b>
     </div>
+    @form(action = routes.AccountController.deleteUser(), 'id -> "deleteUserForm", 'class -> "navbar-form navbar-right") {
+    <div class="form-group">
+        <input type="submit" id="submit" name="delete" class="btn btn-default"/>
+    </div>
+    }
 }
