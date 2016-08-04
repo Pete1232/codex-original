@@ -18,6 +18,6 @@ class AccountControllerSpec extends ControllerSpec{
   it should "redirect an unauthenticated user to login" in {
     val result = controller.displayUserDetails.apply(simpleRequest)
     status(result) mustBe 303
-    redirectLocation(result).get mustBe ("/login")
+    redirectLocation(result).get mustBe ("/login?continueUrl=%2Faccount")
   }
 }

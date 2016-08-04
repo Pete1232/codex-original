@@ -7,7 +7,7 @@ class AccountController @Inject()(implicit webJarAssets: WebJarAssets) extends C
   def displayUserDetails = Action { implicit request =>
     request2session.get("userId") match {
       case Some(userId) => Ok(views.html.account(userId))
-      case _ => Redirect(routes.LoginController.login())
+      case _ => Redirect(routes.LoginController.login(Some("/account")))
     }
   }
 }
