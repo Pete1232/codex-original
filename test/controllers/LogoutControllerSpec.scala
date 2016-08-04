@@ -1,7 +1,7 @@
 package controllers
 
 import config.ControllerSpec
-import play.api.mvc.{Cookie, Cookies}
+import play.api.mvc.Cookie
 import play.api.test.Helpers._
 
 class LogoutControllerSpec extends ControllerSpec{

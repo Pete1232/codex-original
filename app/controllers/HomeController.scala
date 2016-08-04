@@ -1,7 +1,6 @@
 package controllers
 
 import com.google.inject.Inject
-
 import play.Logger
 import play.api.mvc.{Action, Controller}
 
