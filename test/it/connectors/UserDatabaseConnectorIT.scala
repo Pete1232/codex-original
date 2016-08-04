@@ -14,12 +14,12 @@ class UserDatabaseConnectorIT extends AsyncUnitSpec with BeforeAndAfter{
   val connector = new DefaultUserDatabaseConnector
 
   before {
-    Await.ready(connector.clearUserFromDatabase(User("user", "password")), Duration.Inf)
+    Await.ready(connector.deleteUser(User("user", "password")), Duration.Inf)
     Await.ready(connector.createNewUser(User("user", "password")), Duration.Inf)
   }
 
   "createNewUser" must "return a successful write result after saving successfully" in {
-    Await.ready(connector.clearUserFromDatabase(User("user", "password")), Duration.Inf)
+    Await.ready(connector.deleteUser(User("user", "password")), Duration.Inf)
     connector.createNewUser(User("user", "password"))
       .map(_.ok mustBe true)
   }
@@ -73,5 +73,19 @@ class UserDatabaseConnectorIT extends AsyncUnitSpec with BeforeAndAfter{
 
   "generateSalt" must "return a 64 bit salt" in {
     connector.generateSalt.length mustBe 8
+  }
+
+  "deleteUser" must "delete the given user from the database" in {
+    connector.deleteUser(User("user", "password"))
+      .map{ result =>
+        (result.ok, result.n) mustBe (true, 1)
+      }
+  }
+  it must "not be case sensetive" in {
+    Await.ready(connector.createNewUser(User("user2", "password")), Duration.Inf)
+    connector.deleteUser(User("UseR2", "password"))
+      .map{ result =>
+        (result.ok, result.n) mustBe (true, 1)
+      }
   }
 }

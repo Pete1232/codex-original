@@ -7,7 +7,7 @@ import javax.crypto.spec.PBEKeySpec
 import models.{DatabaseUser, User}
 import play.Logger
 import reactivemongo.api.collections.bson.BSONCollection
-import reactivemongo.api.commands.WriteResult
+import reactivemongo.api.commands.{DropIndexesResult, WriteResult}
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader}
 
@@ -81,16 +81,6 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
     byteArray
   }
 
-  /**
-    * For use in testing
-    */
-  def clearUserFromDatabase(user: User): Future[WriteResult] = {
-    Logger.debug(s"Clearing user ${user.userId} from database")
-    userCollection.flatMap{
-      _.remove(BSONDocument("userId" -> user.userId.toLowerCase()))
-    }
-  }
-
   override def verifyUserExists(user: User): Future[Boolean] = {
     Logger.debug("Verifying user existence")
     val query = BSONDocument("userId" -> user.userId)
@@ -99,6 +89,14 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
         .one
     }.map {
       _.isDefined
+    }
+  }
+
+  override def deleteUser(user: User): Future[WriteResult] = {
+    Logger.debug(s"Deleting user ${user.userId} from database")
+    val query = BSONDocument("userId" -> user.userId.toLowerCase)
+    userCollection.flatMap{
+      _.remove(query)
     }
   }
 }

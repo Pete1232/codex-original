@@ -1,6 +1,6 @@
 package connectors
 import models.User
-import reactivemongo.api.commands.{DefaultWriteResult, WriteResult}
+import reactivemongo.api.commands.{DefaultWriteResult, DropIndexesResult, WriteResult}
 
 import scala.concurrent.Future
 
@@ -20,6 +20,13 @@ class MockUserDatabaseConnector extends UserDatabaseConnector{
   }
 
   override def createNewUser(user: User): Future[WriteResult] = {
+    user.userId match {
+      case "fail" => Future.failed(new Exception)
+      case _ => Future.successful(DefaultWriteResult(true, 1, Nil, None, None, None))
+    }
+  }
+
+  override def deleteUser(user: User): Future[WriteResult] = {
     user.userId match {
       case "fail" => Future.failed(new Exception)
       case _ => Future.successful(DefaultWriteResult(true, 1, Nil, None, None, None))

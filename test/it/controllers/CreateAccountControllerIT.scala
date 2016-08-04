@@ -18,7 +18,7 @@ class CreateAccountControllerIT extends ControllerIT with I18nSupport with Befor
   val connector = new DefaultUserDatabaseConnector
 
   after {
-    Await.ready(connector.clearUserFromDatabase(User("user", "password")), Duration.Inf)
+    Await.ready(connector.deleteUser(User("user", "password")), Duration.Inf)
   }
 
   "createPost" must "reload the create account page if the user already exists" in running(application){

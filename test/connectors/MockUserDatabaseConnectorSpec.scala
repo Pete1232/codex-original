@@ -40,4 +40,15 @@ class MockUserDatabaseConnectorSpec extends AsyncUnitSpec with ScalaFutures{
       .verifyUserExists(User("notAUser", "password"))
       .map(_ mustBe false)
   }
+  "deleteUser" must "delete a user from the database" in {
+    mockConnector
+      .deleteUser(User("user", "password"))
+      .map(_.ok mustBe true)
+  }
+  it must "fail for userId 'fail' with a BadRequest exception" in {
+    val result = mockConnector.deleteUser(User("fail", "password"))
+    ScalaFutures.whenReady(result.failed){ e =>
+      e mustBe a[Exception]
+    }
+  }
 }

@@ -9,4 +9,5 @@ trait UserDatabaseConnector {
   def validatePasswordForUser(user: User): Future[Boolean]
   def verifyUserExists(user: User): Future[Boolean]
   def createNewUser(user: User): Future[WriteResult]
+  def deleteUser(user: User): Future[WriteResult]
 }
