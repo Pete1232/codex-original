@@ -36,6 +36,15 @@ class UserDatabaseConnectorIT extends AsyncUnitSpec with BeforeAndAfter{
     }
   }
 
+  "verifyUserExists" must "return true if the user exists" in {
+    connector.verifyUserExists(User("user", "password"))
+      .map(_ mustBe true)
+  }
+  it must "return false if the user does not exist" in {
+    connector.verifyUserExists(User("notAUser", "password"))
+      .map(_ mustBe false)
+  }
+
   "validatePasswordForUser" must "return true if the users password matches the db" in {
     connector.validatePasswordForUser(User("user", "password"))
       .map(_ mustBe true)

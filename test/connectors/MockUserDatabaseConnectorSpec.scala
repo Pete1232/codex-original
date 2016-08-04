@@ -30,4 +30,14 @@ class MockUserDatabaseConnectorSpec extends AsyncUnitSpec with ScalaFutures{
       e mustBe a[Exception]
     }
   }
+  "verifyUserExists" must "return true if the user exists" in {
+    mockConnector
+      .verifyUserExists(User("user", "password"))
+      .map(_ mustBe true)
+  }
+  it must "return false if the user does not exist" in {
+    mockConnector
+      .verifyUserExists(User("notAUser", "password"))
+      .map(_ mustBe false)
+  }
 }

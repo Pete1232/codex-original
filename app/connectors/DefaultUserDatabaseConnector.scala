@@ -90,4 +90,15 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
       _.remove(BSONDocument("userId" -> user.userId.toLowerCase()))
     }
   }
+
+  override def verifyUserExists(user: User): Future[Boolean] = {
+    Logger.debug("Verifying user existence")
+    val query = BSONDocument("userId" -> user.userId)
+    userCollection.flatMap{
+      _.find(query)
+        .one
+    }.map {
+      _.isDefined
+    }
+  }
 }

@@ -12,6 +12,13 @@ class MockUserDatabaseConnector extends UserDatabaseConnector{
     )
   }
 
+  override def verifyUserExists(user: User): Future[Boolean] = {
+    Future.successful(
+      MockDatabase.userDb
+          .contains(user.userId)
+    )
+  }
+
   override def createNewUser(user: User): Future[WriteResult] = {
     user.userId match {
       case "fail" => Future.failed(new Exception)

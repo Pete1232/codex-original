@@ -10,4 +10,7 @@ trait LoginService {
   def validateUser(user: User): Future[Boolean] = {
     validatePasswordForUser(user)
   }
+  def vefiryUserExistence(user: User): Future[Boolean] = {
+    verifyUserExists(user)
+  }
 }
