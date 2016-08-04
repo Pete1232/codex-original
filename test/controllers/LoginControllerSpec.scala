@@ -31,7 +31,7 @@ class LoginControllerSpec extends ControllerSpec with I18nSupport{
     resultString must include(Messages("error.required", "userId"))
     resultString must include(Messages("error.required", "password"))
   }
-  it must "return a form with errors if the credentials were wrong" in {
+  it must "return a form with errors if the credentials were wrong" in running(application){
     val loginFailedResult = controller.loginPost()
       .apply(FakeRequest.apply()
         .withFormUrlEncodedBody(
@@ -62,5 +62,16 @@ class LoginControllerSpec extends ControllerSpec with I18nSupport{
         ))
     status(loginSuccessResult) mustBe 303
     redirectLocation(loginSuccessResult).get mustBe "/account"
+  }
+  it must "return a form with errors if the user does not exist" in running(application){
+    val loginFailedResult = controller.loginPost()
+      .apply(FakeRequest.apply()
+        .withFormUrlEncodedBody(
+          "userId" -> "notAUser",
+          "password" -> "password"
+        ))
+    val resultString = contentAsString(loginFailedResult)
+    resultString must include("<div class=\"alert-message error\">")
+    resultString must include(Messages("login.validation.credentials"))
   }
 }

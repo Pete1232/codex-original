@@ -11,6 +11,7 @@ import services.LoginService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Success
 
 class LoginController @Inject()(loginService: LoginService)(implicit webJarAssets: WebJarAssets, val messagesApi: MessagesApi)
   extends Controller with I18nSupport{
@@ -29,20 +30,22 @@ class LoginController @Inject()(loginService: LoginService)(implicit webJarAsset
       },
       userData => {
         Logger.debug("Validating user credentials")
-        loginService.validateUser(userData).map { valid =>
-          if(valid) {
-            Logger.debug(s"Login successful ${userData.userId}")
-            val continue = continueUrl.getOrElse("/")
-            Logger.debug(s"Redirecting to $continue")
-            Redirect(continue)
-              .withSession("userId" -> userData.userId)
+        loginService.vefiryUserExistence(userData)
+            .flatMap{_ => loginService.validateUser(userData)}
+            .map { valid =>
+            if(valid) {
+              Logger.debug(s"Login successful ${userData.userId}")
+              val continue = continueUrl.getOrElse("/")
+              Logger.debug(s"Redirecting to $continue")
+              Redirect(continue)
+                .withSession("userId" -> userData.userId)
+            }
+            else {
+              Logger.debug("Bad credentials - redirecting to login")
+              val form = userForm.bindFromRequest.copy(errors = Seq(FormError("password","login.validation.credentials")))
+              BadRequest(views.html.login(form))
+            }
           }
-          else {
-            Logger.debug("Bad credentials - redirecting to login")
-            val form = userForm.bindFromRequest.copy(errors = Seq(FormError("password","login.validation.credentials")))
-            BadRequest(views.html.login(form))
-          }
-        }
       }
     )
   }
