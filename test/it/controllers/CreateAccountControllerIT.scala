@@ -18,11 +18,11 @@ class CreateAccountControllerIT extends ControllerIT with I18nSupport with Befor
   val connector = new DefaultUserDatabaseConnector
 
   after {
-    Await.ready(connector.deleteUser(User("user", "password")), Duration.Inf)
+    Await.ready(connector.deleteUser(User("user", "p2SsworD!")), Duration.Inf)
   }
 
   "createPost" must "reload the create account page if the user already exists" in running(application){
-    Await.ready(connector.createNewUser(User("user", "password")), Duration.Inf)
+    Await.ready(connector.createNewUser(User("user", "p2SsworD!")), Duration.Inf)
     val createFailedResult = controller.createPost
       .apply(FakeRequest.apply()
         .withFormUrlEncodedBody(
@@ -32,12 +32,12 @@ class CreateAccountControllerIT extends ControllerIT with I18nSupport with Befor
     status(createFailedResult) mustBe 400
   }
   it must "display a validation error when the user already exists" in running(application){
-    Await.ready(connector.createNewUser(User("user", "password")), Duration.Inf)
+    Await.ready(connector.createNewUser(User("user", "p2SsworD!")), Duration.Inf)
     val createFailedResult = controller.createPost
       .apply(FakeRequest.apply()
         .withFormUrlEncodedBody(
           "userId" -> "user",
-          "password" -> "pa$sword"
+          "password" -> "p2SsworD!"
         ))
     contentAsString(createFailedResult) must include (Messages("login.validation.userExists"))
   }

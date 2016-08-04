@@ -13,6 +13,7 @@ class CreateAccountForm {
       "userId" -> nonEmptyText,
       "password" -> nonEmptyText
         .verifying(passwordLengthConstraint)
+        .verifying(passwordCharactersConstaint)
         .verifying(passwordTopologyConstraint)
     )(User.apply)
       // $COVERAGE-OFF$
@@ -22,8 +23,9 @@ class CreateAccountForm {
 }
 
 object CreateAccountForm {
-  def passwordLengthConstraint: Constraint[String] = stringConstraintBuilder(validatePassword, "login.validation.length")
+  def passwordLengthConstraint: Constraint[String] = stringConstraintBuilder(validatePasswordLength, "login.validation.length")
   def passwordTopologyConstraint: Constraint[String] = stringConstraintBuilder(TopologyParser.validateTopology, "login.validation.topology")
+  def passwordCharactersConstaint: Constraint[String] = stringConstraintBuilder(validatePasswordCharacters, "login.validation.characters")
 
   private def stringConstraintBuilder(validationCheck: String => Boolean, messageKey: String): Constraint[String] = Constraint({
     inputString =>
@@ -37,7 +39,12 @@ object CreateAccountForm {
         Invalid(errors)
       }
   })
-  private def validatePassword(password: String) = {
+  private def validatePasswordLength(password: String) = {
     password.length > 5
+  }
+  private def validatePasswordCharacters(password: String) = {
+    """^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).*$""".r
+      .findFirstMatchIn(password)
+      .isDefined
   }
 }

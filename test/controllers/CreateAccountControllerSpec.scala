@@ -36,7 +36,7 @@ class CreateAccountControllerSpec extends ControllerSpec with I18nSupport{
       .apply(FakeRequest.apply()
         .withFormUrlEncodedBody(
           "userId" -> "user",
-          "password" -> "p2Ssword"
+          "password" -> "p2SsworD!"
         ))
     status(createSuccessResult) mustBe 303
     session(createSuccessResult) mustBe (Session(Map("userId" -> "user")))
@@ -46,7 +46,7 @@ class CreateAccountControllerSpec extends ControllerSpec with I18nSupport{
       .apply(FakeRequest.apply()
         .withFormUrlEncodedBody(
           "userId" -> "fail",
-          "password" -> "p2Ssword"
+          "password" -> "p2SsworD!"
         ))
     status(createFailedResult) mustBe 303
     redirectLocation(createFailedResult).get mustBe ("/error")
