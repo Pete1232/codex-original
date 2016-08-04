@@ -15,11 +15,12 @@ import scala.concurrent.Future
 class LoginController @Inject()(loginService: LoginService)(implicit webJarAssets: WebJarAssets, val messagesApi: MessagesApi)
   extends Controller with I18nSupport{
   val userForm = new UserForm(loginService).userForm
-  val login = Action{
-    Ok(views.html.login(userForm)).withHeaders()
+  def login(continueUrl: Option[String] = None) = Action{
+    Logger.debug(s"Setting continueUrl to ${continueUrl.getOrElse("/")}")
+    Ok(views.html.login(userForm, continueUrl)).withHeaders()
   }
 
-  val loginPost = Action.async {implicit request =>
+  def loginPost(continueUrl: Option[String] = None) = Action.async {implicit request =>
     userForm.bindFromRequest.fold(
       formWithErrors => {
         Logger.debug("Error creating form")
@@ -31,13 +32,15 @@ class LoginController @Inject()(loginService: LoginService)(implicit webJarAsset
         loginService.validateUser(userData).map { valid =>
           if(valid) {
             Logger.debug(s"Login successful ${userData.userId}")
-            Redirect(routes.HomeController.home)
+            val continue = continueUrl.getOrElse("/")
+            Logger.debug(s"Redirecting to $continue")
+            Redirect(continue)
               .withSession("userId" -> userData.userId)
           }
           else {
             Logger.debug("Bad credentials - redirecting to login")
             val form = userForm.bindFromRequest.copy(errors = Seq(FormError("password","login.validation.credentials")))
-            BadRequest(views.html.create(form))
+            BadRequest(views.html.login(form))
           }
         }
       }

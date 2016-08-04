@@ -11,7 +11,7 @@ class LoginControllerSpec extends ControllerSpec with I18nSupport{
   implicit val messagesApi = application.injector.instanceOf[MessagesApi]
   implicit val loginService = application.injector.instanceOf[LoginService]
   val controller = new LoginController(loginService)
-  val result = controller.login.apply(simpleRequest)
+  val result = controller.login().apply(simpleRequest)
   val resultString = contentAsString(result)
 
   "login" must "load the login page" in {
@@ -25,14 +25,14 @@ class LoginControllerSpec extends ControllerSpec with I18nSupport{
     resultString must include("<input type=\"text\" id=\"password\" name=\"password\"")
   }
   "loginPost" must "return a form with errors if the form had missing data" in {
-    val fieldRequiredResult = controller.loginPost.apply(simpleRequest)
+    val fieldRequiredResult = controller.loginPost().apply(simpleRequest)
     val resultString = contentAsString(fieldRequiredResult)
     resultString must include("<div class=\"alert-message error\">")
     resultString must include(Messages("error.required", "userId"))
     resultString must include(Messages("error.required", "password"))
   }
   it must "return a form with errors if the credentials were wrong" in {
-    val loginFailedResult = controller.loginPost
+    val loginFailedResult = controller.loginPost()
       .apply(FakeRequest.apply()
         .withFormUrlEncodedBody(
           "userId" -> "user",
@@ -43,13 +43,24 @@ class LoginControllerSpec extends ControllerSpec with I18nSupport{
     resultString must include(Messages("login.validation.credentials"))
   }
   it must "redirect to home with a session cookie after login" in running(application) {
-    val loginSuccessResult = controller.loginPost
+    val loginSuccessResult = controller.loginPost()
       .apply(FakeRequest.apply()
         .withFormUrlEncodedBody(
           "userId" -> "user",
           "password" -> "password"
         ))
     status(loginSuccessResult) mustBe 303
+    redirectLocation(loginSuccessResult).get mustBe "/"
     session(loginSuccessResult) mustBe (Session(Map("userId" -> "user")))
+  }
+  it must "redirect to the given url after login when provided" in running(application) {
+    val loginSuccessResult = controller.loginPost(Some("/account"))
+      .apply(FakeRequest.apply()
+        .withFormUrlEncodedBody(
+          "userId" -> "user",
+          "password" -> "password"
+        ))
+    status(loginSuccessResult) mustBe 303
+    redirectLocation(loginSuccessResult).get mustBe "/account"
   }
 }
