@@ -1,5 +1,0 @@
-package services
-
-import connectors.MockUserDatabaseConnector
-
-class MockLoginService extends MockUserDatabaseConnector with LoginService

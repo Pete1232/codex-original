@@ -1,11 +1,11 @@
 package forms
 
 import config.UnitSpec
-import services.MockLoginService
+import connectors.MockUserDatabaseConnector
 
-class UserFormSpec extends UnitSpec{
+class UserFormSpec extends UnitSpec {
 
-  val userForm = new UserForm(new MockLoginService).userForm
+  val userForm = new UserForm(new MockUserDatabaseConnector).userForm
 
   def testForAnError(userId: String, password: String, errorId: String) = {
     userForm
@@ -37,7 +37,7 @@ class UserFormSpec extends UnitSpec{
     val errors = userForm
       .bind(Map("userId" -> "", "password" -> "password"))
       .errors
-    errors.foreach {error =>
+    errors.foreach { error =>
       error.message must not be "login.validation.userId"
       error.message must not be "login.validation.credentials"
     }
@@ -46,7 +46,7 @@ class UserFormSpec extends UnitSpec{
     val errors = userForm
       .bind(Map("userId" -> "user", "password" -> ""))
       .errors
-    errors.foreach {error =>
+    errors.foreach { error =>
       error.message must not be "login.validation.userId"
       error.message must not be "login.validation.credentials"
     }

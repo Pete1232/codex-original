@@ -1,5 +1,0 @@
-package services
-
-import connectors.DefaultUserDatabaseConnector
-
-class DefaultLoginService extends DefaultUserDatabaseConnector with LoginService

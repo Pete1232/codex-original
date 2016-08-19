@@ -1,16 +1,16 @@
 package controllers
 
 import config.ControllerSpec
+import connectors.UserDatabaseConnector
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.Session
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.LoginService
 
-class LoginControllerSpec extends ControllerSpec with I18nSupport{
+class LoginControllerSpec extends ControllerSpec with I18nSupport {
   implicit val messagesApi = application.injector.instanceOf[MessagesApi]
-  implicit val loginService = application.injector.instanceOf[LoginService]
-  val controller = new LoginController(loginService)
+  implicit val userDatabaseConnector = application.injector.instanceOf[UserDatabaseConnector]
+  val controller = new LoginController(userDatabaseConnector)
   val result = controller.login().apply(simpleRequest)
   val resultString = contentAsString(result)
 
@@ -20,7 +20,7 @@ class LoginControllerSpec extends ControllerSpec with I18nSupport{
   }
   it must "display the login form" in {
     val resultString = contentAsString(result)
-    resultString must include regex("""(<form)(.*)(id="loginForm")""".r)
+    resultString must include regex ("""(<form)(.*)(id="loginForm")""".r)
     resultString must include("<input type=\"text\" id=\"userId\" name=\"userId\"")
     resultString must include("<input type=\"text\" id=\"password\" name=\"password\"")
   }
@@ -31,7 +31,7 @@ class LoginControllerSpec extends ControllerSpec with I18nSupport{
     resultString must include(Messages("error.required", "userId"))
     resultString must include(Messages("error.required", "password"))
   }
-  it must "return a form with errors if the credentials were wrong" in running(application){
+  it must "return a form with errors if the credentials were wrong" in running(application) {
     val loginFailedResult = controller.loginPost()
       .apply(FakeRequest.apply()
         .withFormUrlEncodedBody(
@@ -63,7 +63,7 @@ class LoginControllerSpec extends ControllerSpec with I18nSupport{
     status(loginSuccessResult) mustBe 303
     redirectLocation(loginSuccessResult).get mustBe "/account"
   }
-  it must "return a form with errors if the user does not exist" in running(application){
+  it must "return a form with errors if the user does not exist" in running(application) {
     val loginFailedResult = controller.loginPost()
       .apply(FakeRequest.apply()
         .withFormUrlEncodedBody(

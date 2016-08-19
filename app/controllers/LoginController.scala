@@ -2,20 +2,19 @@ package controllers
 
 import javax.inject.Inject
 
+import connectors.UserDatabaseConnector
 import forms.UserForm
 import play.Logger
 import play.api.data.FormError
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, Controller}
-import services.LoginService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.Success
 
-class LoginController @Inject()(loginService: LoginService)(implicit webJarAssets: WebJarAssets, val messagesApi: MessagesApi)
+class LoginController @Inject()(userDatabaseConnector: UserDatabaseConnector)(implicit webJarAssets: WebJarAssets, val messagesApi: MessagesApi)
   extends Controller with I18nSupport{
-  val userForm = new UserForm(loginService).userForm
+  val userForm = new UserForm(userDatabaseConnector).userForm
   def login(continueUrl: Option[String] = None) = Action{
     Logger.debug(s"Setting continueUrl to ${continueUrl.getOrElse("/")}")
     Ok(views.html.login(userForm, continueUrl)).withHeaders()
@@ -30,8 +29,8 @@ class LoginController @Inject()(loginService: LoginService)(implicit webJarAsset
       },
       userData => {
         Logger.debug("Validating user credentials")
-        loginService.vefiryUserExistence(userData)
-            .flatMap{_ => loginService.validateUser(userData)}
+        userDatabaseConnector.verifyUserExists(userData)
+            .flatMap{_ => userDatabaseConnector.validatePasswordForUser(userData)}
             .map { valid =>
             if(valid) {
               Logger.debug(s"Login successful ${userData.userId}")
