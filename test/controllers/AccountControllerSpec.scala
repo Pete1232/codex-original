@@ -5,13 +5,19 @@ import connectors.UserDatabaseConnector
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class AccountControllerSpec extends ControllerSpec{
+class AccountControllerSpec extends ControllerSpec {
   implicit val userDatabaseConnector = application.injector.instanceOf[UserDatabaseConnector]
   val controller = new AccountController(userDatabaseConnector)
-  "displayUserDetails" must "allow an authenticated user to view the page" in running(application){
+  val csrfTags = Map(
+    "CSRF_TOKEN_NAME" -> "csrfToken",
+    "CSRF_TOKEN_RE_SIGNED" -> "csrf-token-goes-here"
+  )
+
+  "displayUserDetails" must "allow an authenticated user to view the page" in running(application) {
     val result = controller.displayUserDetails
       .apply(
         FakeRequest()
+          .copyFakeRequest(tags = csrfTags)
           .withSession("userId" -> "user")
       )
     status(result) mustBe 200
@@ -22,7 +28,7 @@ class AccountControllerSpec extends ControllerSpec{
     status(result) mustBe 303
     redirectLocation(result).get mustBe ("/login?continueUrl=%2Faccount")
   }
-  "deleteUser" must "redirect to the logout controller" in running(application){
+  "deleteUser" must "redirect to the logout controller" in running(application) {
     val result = controller.deleteUser.apply(simpleRequest.withSession("userId" -> "user"))
     status(result) mustBe 303
     redirectLocation(result).get mustBe "/logout"
