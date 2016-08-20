@@ -12,10 +12,11 @@ import play.api.mvc.{Action, Controller}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class LoginController @Inject()(userDatabaseConnector: UserDatabaseConnector)(implicit webJarAssets: WebJarAssets, val messagesApi: MessagesApi)
+class LoginController @Inject()(userDatabaseConnector: UserDatabaseConnector)
+                               (implicit webJarAssets: WebJarAssets, val messagesApi: MessagesApi)
   extends Controller with I18nSupport{
   val userForm = new UserForm(userDatabaseConnector).userForm
-  def login(continueUrl: Option[String] = None) = Action{
+  def login(continueUrl: Option[String] = None) = Action{ implicit request =>
     Logger.debug(s"Setting continueUrl to ${continueUrl.getOrElse("/")}")
     Ok(views.html.login(userForm, continueUrl)).withHeaders()
   }

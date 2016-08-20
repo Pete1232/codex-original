@@ -23,6 +23,8 @@ libraryDependencies ++= Seq(
   testDependencies
 ).flatten
 
+libraryDependencies += filters
+
 lazy val appDependencies = Seq(
   "org.webjars" %% "webjars-play" % "2.5.0",
   "org.webjars" % "bootstrap" % "3.3.6",
