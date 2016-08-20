@@ -95,7 +95,7 @@ class LoginControllerSpec extends ControllerSpec with I18nSupport {
   }
   it must "require a CSRF token to be present" in {
     intercept[RuntimeException] {
-      contentAsString(controller.login().apply(simpleRequest))
+      contentAsString(controller.loginPost().apply(simpleRequest))
     }.getMessage mustBe ("No CSRF token present!")
   }
 }

@@ -7,25 +7,38 @@ import play.api.mvc.Session
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class CreateAccountControllerSpec extends ControllerSpec with I18nSupport{
+class CreateAccountControllerSpec extends ControllerSpec with I18nSupport {
   implicit val messagesApi = application.injector.instanceOf[MessagesApi]
   val mockUserDatabaseConnector = application.injector.instanceOf[UserDatabaseConnector]
   val controller = new CreateAccountController(mockUserDatabaseConnector)
-  val result = controller.create.apply(simpleRequest)
-  val resultString = contentAsString(result)
+  val csrfTags = Map(
+    "CSRF_TOKEN_NAME" -> "csrfToken",
+    "CSRF_TOKEN_RE_SIGNED" -> "csrf-token-goes-here"
+  )
 
   "createAccount" must "display the create account page" in {
+    val result = controller.create
+      .apply(FakeRequest()
+        .copyFakeRequest(tags = csrfTags)
+      )
     status(result) mustBe 200
-    resultString must include("<title>Create Account</title>")
+    contentAsString(result) must include("<title>Create Account</title>")
   }
   it must "display the create account form" in {
+    val result = controller.create
+      .apply(FakeRequest()
+        .copyFakeRequest(tags = csrfTags)
+      )
     val resultString = contentAsString(result)
-    resultString must include regex("""(<form)(.*)(id="createAccountForm")""".r)
+    resultString must include regex ("""(<form)(.*)(id="createAccountForm")""".r)
     resultString must include("<input type=\"text\" id=\"userId\" name=\"userId\"")
     resultString must include("<input type=\"text\" id=\"password\" name=\"password\"")
   }
   "createPost" must "return a form with errors if the form had missing data" in {
-    val fieldRequiredResult = controller.createPost.apply(simpleRequest)
+    val fieldRequiredResult = controller.createPost
+      .apply(FakeRequest()
+        .copyFakeRequest(tags = csrfTags)
+      )
     val resultString = contentAsString(fieldRequiredResult)
     resultString must include("<div class=\"alert-message error\">")
     resultString must include(Messages("error.required", "userId"))
@@ -41,7 +54,7 @@ class CreateAccountControllerSpec extends ControllerSpec with I18nSupport{
     status(createSuccessResult) mustBe 303
     session(createSuccessResult) mustBe (Session(Map("userId" -> "user")))
   }
-  it must "redirect to the page with errors if the save failed" in running(application){
+  it must "redirect to the page with errors if the save failed" in running(application) {
     val createFailedResult = controller.createPost
       .apply(FakeRequest.apply()
         .withFormUrlEncodedBody(
@@ -54,6 +67,7 @@ class CreateAccountControllerSpec extends ControllerSpec with I18nSupport{
   it must "display the password strength tips if the password was blacklisted" in {
     val createBadTopologyResult = controller.createPost
       .apply(FakeRequest.apply()
+        .copyFakeRequest(tags = csrfTags)
         .withFormUrlEncodedBody(
           "userId" -> "fail",
           "password" -> "password"
@@ -62,7 +76,16 @@ class CreateAccountControllerSpec extends ControllerSpec with I18nSupport{
     contentAsString(createBadTopologyResult) must include(Messages("login.validation.topology.help.content"))
   }
   it must "not display the password strength tips otherwise" in {
-    resultString must not include(Messages("login.validation.topology.help.header"))
-    resultString must not include(Messages("login.validation.topology.help.content"))
+    val result = controller.create
+      .apply(FakeRequest()
+        .copyFakeRequest(tags = csrfTags)
+      )
+    contentAsString(result) must not include (Messages("login.validation.topology.help.header"))
+    contentAsString(result) must not include (Messages("login.validation.topology.help.content"))
+  }
+  it must "require a CSRF token to be present" in {
+    intercept[RuntimeException] {
+      contentAsString(controller.createPost().apply(simpleRequest))
+    }.getMessage mustBe ("No CSRF token present!")
   }
 }

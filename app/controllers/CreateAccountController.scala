@@ -15,7 +15,7 @@ import scala.concurrent.Future
 class CreateAccountController @Inject()(userDatabaseConnector: UserDatabaseConnector)(implicit webJarAssets: WebJarAssets, val messagesApi: MessagesApi)
   extends Controller with I18nSupport{
   val accountForm = new CreateAccountForm().form
-  val create = Action {
+  val create = Action { implicit request =>
     Ok(views.html.create(accountForm))
   }
 

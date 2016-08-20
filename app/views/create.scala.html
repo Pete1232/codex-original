@@ -1,9 +1,10 @@
 @import helper._
 
-@(accountForm: Form[models.User])(implicit webJarAssets: WebJarAssets, messages: Messages)
+@(accountForm: Form[models.User])(implicit webJarAssets: WebJarAssets, messages: Messages, rh: RequestHeader)
 @main("Create Account")("Create a new account")("Make a new account to access more services"){
     @form(action = routes.CreateAccountController.createPost(), 'id -> "createAccountForm", 'class -> "navbar-form") {
         <div class="form-group">
+            @CSRF.formField
             @inputText(accountForm("userId"), '_showErrors -> false, 'class -> "form-control", '_label -> "User ID", '_help -> "This field is required")
             @inputText(accountForm("password"), '_showErrors -> false, 'class -> "form-control", '_label -> "Password", '_help -> "This field is required")
             <input type="submit" id="submit" name="submit" class="btn btn-default"/>
