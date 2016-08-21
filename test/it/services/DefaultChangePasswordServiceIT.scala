@@ -5,13 +5,13 @@ import connectors.UserDatabaseConnector
 import models.{DatabaseUser, User}
 import org.scalatest.BeforeAndAfter
 import reactivemongo.bson.BSONDocument
-import services.ChangePasswordService
+import services.DefaultChangePasswordService
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class ChangePasswordServiceIT extends AsyncServiceSpec with BeforeAndAfter {
-  val service = new ChangePasswordService
+class DefaultChangePasswordServiceIT extends AsyncServiceSpec with BeforeAndAfter {
+  val service = new DefaultChangePasswordService
   implicit val userDatabaseConnector = application.injector.instanceOf[UserDatabaseConnector]
 
   before {
