@@ -16,7 +16,7 @@ import scala.concurrent.Future
 
 class DefaultUserDatabaseConnector extends UserDatabaseConnector{
 
-  implicit object InfantryReader extends BSONDocumentReader[DatabaseUser] {
+  implicit object UserReader extends BSONDocumentReader[DatabaseUser] {
     def read(doc: BSONDocument): DatabaseUser = {
       val userId = doc.getAs[String]("userId").get
       val password = doc.getAs[Array[Byte]]("password").get
@@ -26,7 +26,7 @@ class DefaultUserDatabaseConnector extends UserDatabaseConnector{
     }
   }
 
-  def userCollection: Future[BSONCollection] =
+  override def userCollection: Future[BSONCollection] =
     connection.database("codex").
       map(_.collection("users"))
 

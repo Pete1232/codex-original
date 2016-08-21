@@ -1,5 +1,6 @@
 package connectors
 import models.User
+import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.commands.{DefaultWriteResult, DropIndexesResult, WriteResult}
 
 import scala.concurrent.Future
@@ -32,4 +33,6 @@ class MockUserDatabaseConnector extends UserDatabaseConnector{
       case _ => Future.successful(DefaultWriteResult(true, 1, Nil, None, None, None))
     }
   }
+
+  override def userCollection: Future[BSONCollection] = ???
 }
