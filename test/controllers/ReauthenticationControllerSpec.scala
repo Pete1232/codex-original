@@ -90,7 +90,6 @@ class ReauthenticationControllerSpec extends ControllerSpec with I18nSupport {
       )
     status(loginSuccessResult) mustBe 303
     redirectLocation(loginSuccessResult).get mustBe "/"
-    session(loginSuccessResult) mustBe (Session(Map("userId" -> "user")))
   }
   it must "redirect to the given url after login when provided" in running(application) {
     val loginSuccessResult = controller.reauthPost(Some("/account"))
@@ -149,5 +148,28 @@ class ReauthenticationControllerSpec extends ControllerSpec with I18nSupport {
         )
       )
     redirectLocation(result).get mustBe ("/login?continueUrl=%2FrandomLocation")
+  }
+  it must "add a flash cookie after successful reauthentication" in running(application) {
+    val loginSuccessResult = controller.reauthPost()
+      .apply(FakeRequest.apply()
+        .withFormUrlEncodedBody(
+          "userId" -> "user",
+          "password" -> "password"
+        )
+        .withSession("userId" -> "user")
+      )
+    flash(loginSuccessResult).apply("REAUTH_SUCCESS") mustBe "true"
+  }
+  it must "only validate the currently logged in user" in running(application) {
+    val loginSuccessResult = controller.reauthPost()
+      .apply(FakeRequest.apply()
+        .withFormUrlEncodedBody(
+          "userId" -> "user2",
+          "password" -> "password"
+        )
+        .copyFakeRequest(tags = csrfTags)
+        .withSession("userId" -> "user")
+      )
+    status(loginSuccessResult) mustBe 400
   }
 }

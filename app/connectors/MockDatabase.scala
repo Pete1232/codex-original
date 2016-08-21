@@ -10,6 +10,7 @@ object MockDatabase {
   )
 
   val userDb = Map(
-    "user" -> "password"
+    "user" -> "password",
+    "user2" -> "password"
   )
 }

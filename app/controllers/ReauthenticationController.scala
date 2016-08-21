@@ -36,23 +36,29 @@ class ReauthenticationController @Inject()(userDatabaseConnector: UserDatabaseCo
             Future.successful(BadRequest(views.html.reauth(formWithErrors)))
           },
           userData => {
-            Logger.debug("Validating user credentials")
-            userDatabaseConnector.verifyUserExists(userData)
-              .flatMap{_ => userDatabaseConnector.validatePasswordForUser(userData)}
-              .map { valid =>
-                if(valid) {
-                  Logger.debug(s"Login successful ${userData.userId}")
-                  val continue = continueUrl.getOrElse("/")
-                  Logger.debug(s"Redirecting to $continue")
-                  Redirect(continue)
-                    .withSession("userId" -> userData.userId)
+            if(userId == userData.userId) {
+              Logger.debug("Validating user credentials")
+              userDatabaseConnector.verifyUserExists(userData)
+                .flatMap { _ => userDatabaseConnector.validatePasswordForUser(userData) }
+                .map { valid =>
+                  if (valid) {
+                    Logger.debug(s"Login successful ${userData.userId}")
+                    val continue = continueUrl.getOrElse("/")
+                    Logger.debug(s"Redirecting to $continue")
+                    Redirect(continue)
+                      .flashing("REAUTH_SUCCESS" -> "true")
+                  }
+                  else {
+                    Logger.debug("Bad credentials - redirecting to login")
+                    val form = userForm.bindFromRequest.copy(errors = Seq(FormError("password", "login.validation.credentials")))
+                    BadRequest(views.html.reauth(form))
+                  }
                 }
-                else {
-                  Logger.debug("Bad credentials - redirecting to login")
-                  val form = userForm.bindFromRequest.copy(errors = Seq(FormError("password","login.validation.credentials")))
-                  BadRequest(views.html.reauth(form))
-                }
-              }
+            }
+            else {
+              val form = userForm.bindFromRequest.copy(errors = Seq(FormError("password", "login.validation.unauthorised")))
+              Future.successful(BadRequest(views.html.reauth(form)))
+            }
           }
         )
       }
