@@ -33,7 +33,7 @@ class ReauthenticationController @Inject()(userDatabaseConnector: UserDatabaseCo
           formWithErrors => {
             Logger.debug("Error creating form")
             formWithErrors.errors.foreach(error => Logger.info(s"Validation error on field ${error.messages}"))
-            Future.successful(BadRequest(views.html.reauth(formWithErrors)))
+            Future.successful(BadRequest(views.html.reauth(formWithErrors, continueUrl)))
           },
           userData => {
             if(userId == userData.userId) {
@@ -51,13 +51,13 @@ class ReauthenticationController @Inject()(userDatabaseConnector: UserDatabaseCo
                   else {
                     Logger.debug("Bad credentials - redirecting to login")
                     val form = userForm.bindFromRequest.copy(errors = Seq(FormError("password", "login.validation.credentials")))
-                    BadRequest(views.html.reauth(form))
+                    BadRequest(views.html.reauth(form, continueUrl))
                   }
                 }
             }
             else {
               val form = userForm.bindFromRequest.copy(errors = Seq(FormError("password", "login.validation.unauthorised")))
-              Future.successful(BadRequest(views.html.reauth(form)))
+              Future.successful(BadRequest(views.html.reauth(form, continueUrl)))
             }
           }
         )

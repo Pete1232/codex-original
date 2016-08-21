@@ -26,7 +26,7 @@ class LoginController @Inject()(userDatabaseConnector: UserDatabaseConnector)
       formWithErrors => {
         Logger.debug("Error creating form")
         formWithErrors.errors.foreach(error => Logger.info(s"Validation error on field ${error.messages}"))
-        Future.successful(BadRequest(views.html.login(formWithErrors)))
+        Future.successful(BadRequest(views.html.login(formWithErrors, continueUrl)))
       },
       userData => {
         Logger.debug("Validating user credentials")
@@ -43,7 +43,7 @@ class LoginController @Inject()(userDatabaseConnector: UserDatabaseConnector)
             else {
               Logger.debug("Bad credentials - redirecting to login")
               val form = userForm.bindFromRequest.copy(errors = Seq(FormError("password","login.validation.credentials")))
-              BadRequest(views.html.login(form))
+              BadRequest(views.html.login(form, continueUrl))
             }
           }
       }
