@@ -7,7 +7,7 @@ import play.api.mvc.Session
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class ReauthenticationControllerSpec extends ControllerSpec with I18nSupport{
+class ReauthenticationControllerSpec extends ControllerSpec with I18nSupport {
   implicit val messagesApi = application.injector.instanceOf[MessagesApi]
   implicit val userDatabaseConnector = application.injector.instanceOf[UserDatabaseConnector]
 
@@ -22,6 +22,7 @@ class ReauthenticationControllerSpec extends ControllerSpec with I18nSupport{
     val result = controller.reauth()
       .apply(FakeRequest()
         .copyFakeRequest(tags = csrfTags)
+        .withSession("userId" -> "user")
       )
     status(result) mustBe 200
     contentAsString(result) must include("<title>Reauthentication</title>")
@@ -30,6 +31,7 @@ class ReauthenticationControllerSpec extends ControllerSpec with I18nSupport{
     val result = controller.reauth()
       .apply(FakeRequest()
         .copyFakeRequest(tags = csrfTags)
+        .withSession("userId" -> "user")
       )
     val resultString = contentAsString(result)
 
@@ -38,10 +40,25 @@ class ReauthenticationControllerSpec extends ControllerSpec with I18nSupport{
     resultString must include("<input type=\"text\" id=\"password\" name=\"password\"")
     resultString must include regex (s"""<input type=\"hidden\" name=\"csrfToken\" value=\"${csrfTags.apply("CSRF_TOKEN_RE_SIGNED")}\"/>""".r)
   }
+  it must "require the user to have a session" in {
+    val result = controller.reauth()
+      .apply(FakeRequest()
+        .copyFakeRequest(tags = csrfTags)
+      )
+    status(result) mustBe 303
+  }
+  it must "return to the original request url after login" in {
+    val result = controller.reauth(Some("/randomLocation"))
+      .apply(FakeRequest()
+        .copyFakeRequest(tags = csrfTags)
+      )
+    redirectLocation(result).get mustBe ("/login?continueUrl=%2FrandomLocation")
+  }
   "reauthPost" must "return a form with errors if the form had missing data" in running(application) {
     val fieldRequiredResult = controller.reauthPost()
       .apply(FakeRequest()
         .copyFakeRequest(tags = csrfTags)
+        .withSession("userId" -> "user")
       )
     val resultString = contentAsString(fieldRequiredResult)
     resultString must include("<div class=\"alert-message error\">")
@@ -55,7 +72,9 @@ class ReauthenticationControllerSpec extends ControllerSpec with I18nSupport{
         .withFormUrlEncodedBody(
           "userId" -> "user",
           "password" -> "badPassword"
-        ))
+        )
+        .withSession("userId" -> "user")
+      )
     val resultString = contentAsString(loginFailedResult)
     resultString must include("<div class=\"alert-message error\">")
     resultString must include(Messages("login.validation.credentials"))
@@ -66,7 +85,9 @@ class ReauthenticationControllerSpec extends ControllerSpec with I18nSupport{
         .withFormUrlEncodedBody(
           "userId" -> "user",
           "password" -> "password"
-        ))
+        )
+        .withSession("userId" -> "user")
+      )
     status(loginSuccessResult) mustBe 303
     redirectLocation(loginSuccessResult).get mustBe "/"
     session(loginSuccessResult) mustBe (Session(Map("userId" -> "user")))
@@ -77,7 +98,9 @@ class ReauthenticationControllerSpec extends ControllerSpec with I18nSupport{
         .withFormUrlEncodedBody(
           "userId" -> "user",
           "password" -> "password"
-        ))
+        )
+        .withSession("userId" -> "user")
+      )
     status(loginSuccessResult) mustBe 303
     redirectLocation(loginSuccessResult).get mustBe "/account"
   }
@@ -88,14 +111,32 @@ class ReauthenticationControllerSpec extends ControllerSpec with I18nSupport{
         .withFormUrlEncodedBody(
           "userId" -> "notAUser",
           "password" -> "password"
-        ))
+        )
+        .withSession("userId" -> "user")
+      )
     val resultString = contentAsString(loginFailedResult)
     resultString must include("<div class=\"alert-message error\">")
     resultString must include(Messages("login.validation.credentials"))
   }
-  it must "require a CSRF token to be present" in {
+  it must "require a CSRF token to be present" in running(application){
     intercept[RuntimeException] {
-      contentAsString(controller.reauthPost().apply(simpleRequest))
+      contentAsString(controller.reauthPost()
+        .apply(simpleRequest
+          .withSession("userId" -> "user")
+        )
+      )
     }.getMessage mustBe ("No CSRF token present!")
+  }
+  it must "require the user to have a session" in running(application) {
+    val result = controller.reauthPost()
+      .apply(FakeRequest()
+        .copyFakeRequest(tags = csrfTags)
+        .withFormUrlEncodedBody(
+          "userId" -> "user",
+          "password" -> "password"
+        )
+      )
+    status(result) mustBe 303
+    redirectLocation(result).get mustBe ("/login")
   }
 }

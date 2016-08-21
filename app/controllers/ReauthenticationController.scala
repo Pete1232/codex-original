@@ -17,36 +17,46 @@ class ReauthenticationController @Inject()(userDatabaseConnector: UserDatabaseCo
   extends Controller with I18nSupport{
   val userForm = new UserForm(userDatabaseConnector).userForm
   def reauth(continueUrl: Option[String] = None) = Action{ implicit request =>
-    Logger.debug(s"Setting continueUrl to ${continueUrl.getOrElse("/")}")
-    Ok(views.html.reauth(userForm, continueUrl)).withHeaders()
+    request2session.get("userId") match {
+      case Some(userId) => {
+        Logger.debug(s"Setting continueUrl to ${continueUrl.getOrElse("/")}")
+        Ok(views.html.reauth(userForm, continueUrl)).withHeaders()
+      }
+      case _ => Redirect(routes.LoginController.login(continueUrl))
+    }
   }
 
   def reauthPost(continueUrl: Option[String] = None) = Action.async {implicit request =>
-    userForm.bindFromRequest.fold(
-      formWithErrors => {
-        Logger.debug("Error creating form")
-        formWithErrors.errors.foreach(error => Logger.info(s"Validation error on field ${error.messages}"))
-        Future.successful(BadRequest(views.html.reauth(formWithErrors)))
-      },
-      userData => {
-        Logger.debug("Validating user credentials")
-        userDatabaseConnector.verifyUserExists(userData)
-          .flatMap{_ => userDatabaseConnector.validatePasswordForUser(userData)}
-          .map { valid =>
-            if(valid) {
-              Logger.debug(s"Login successful ${userData.userId}")
-              val continue = continueUrl.getOrElse("/")
-              Logger.debug(s"Redirecting to $continue")
-              Redirect(continue)
-                .withSession("userId" -> userData.userId)
-            }
-            else {
-              Logger.debug("Bad credentials - redirecting to login")
-              val form = userForm.bindFromRequest.copy(errors = Seq(FormError("password","login.validation.credentials")))
-              BadRequest(views.html.reauth(form))
-            }
+    request2session.get("userId") match {
+      case Some(userId) => {
+        userForm.bindFromRequest.fold(
+          formWithErrors => {
+            Logger.debug("Error creating form")
+            formWithErrors.errors.foreach(error => Logger.info(s"Validation error on field ${error.messages}"))
+            Future.successful(BadRequest(views.html.reauth(formWithErrors)))
+          },
+          userData => {
+            Logger.debug("Validating user credentials")
+            userDatabaseConnector.verifyUserExists(userData)
+              .flatMap{_ => userDatabaseConnector.validatePasswordForUser(userData)}
+              .map { valid =>
+                if(valid) {
+                  Logger.debug(s"Login successful ${userData.userId}")
+                  val continue = continueUrl.getOrElse("/")
+                  Logger.debug(s"Redirecting to $continue")
+                  Redirect(continue)
+                    .withSession("userId" -> userData.userId)
+                }
+                else {
+                  Logger.debug("Bad credentials - redirecting to login")
+                  val form = userForm.bindFromRequest.copy(errors = Seq(FormError("password","login.validation.credentials")))
+                  BadRequest(views.html.reauth(form))
+                }
+              }
           }
+        )
       }
-    )
+      case _ => Future.successful(Redirect(routes.LoginController.login(continueUrl)))
+    }
   }
 }
