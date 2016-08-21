@@ -7,7 +7,9 @@ scalaVersion := "2.11.8"
 lazy val codex = (project in file("."))
   .enablePlugins(PlayScala)
   .configs(IntegrationTest)
+  .configs(UnitTest)
   .settings(inConfig(IntegrationTest)(Defaults.testTasks) : _*)
+  .settings(inConfig(UnitTest)(Defaults.testTasks) : _*)
   .settings(
     testOptions in UnitTest := Seq(Tests.Filter(unitFilter)),
     testOptions in IntegrationTest := Seq(Tests.Filter(itFilter))
