@@ -139,4 +139,15 @@ class ReauthenticationControllerSpec extends ControllerSpec with I18nSupport {
     status(result) mustBe 303
     redirectLocation(result).get mustBe ("/login")
   }
+  it must "return to the original request url after login" in {
+    val result = controller.reauthPost(Some("/randomLocation"))
+      .apply(FakeRequest()
+        .copyFakeRequest(tags = csrfTags)
+        .withFormUrlEncodedBody(
+          "userId" -> "user",
+          "password" -> "password"
+        )
+      )
+    redirectLocation(result).get mustBe ("/login?continueUrl=%2FrandomLocation")
+  }
 }
