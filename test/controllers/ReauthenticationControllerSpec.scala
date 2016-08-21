@@ -103,20 +103,6 @@ class ReauthenticationControllerSpec extends ControllerSpec with I18nSupport {
     status(loginSuccessResult) mustBe 303
     redirectLocation(loginSuccessResult).get mustBe "/account"
   }
-  it must "return a form with errors if the user does not exist" in running(application) {
-    val loginFailedResult = controller.reauthPost()
-      .apply(FakeRequest.apply()
-        .copyFakeRequest(tags = csrfTags)
-        .withFormUrlEncodedBody(
-          "userId" -> "notAUser",
-          "password" -> "password"
-        )
-        .withSession("userId" -> "user")
-      )
-    val resultString = contentAsString(loginFailedResult)
-    resultString must include("<div class=\"alert-message error\">")
-    resultString must include(Messages("login.validation.credentials"))
-  }
   it must "require a CSRF token to be present" in running(application){
     intercept[RuntimeException] {
       contentAsString(controller.reauthPost()
