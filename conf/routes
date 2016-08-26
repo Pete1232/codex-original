@@ -8,6 +8,8 @@ GET     /sign-up                    controllers.CreateAccountController.create
 POST    /sign-up                    controllers.CreateAccountController.createPost
 GET     /logout                     controllers.LogoutController.logout
 GET     /account                    controllers.AccountController.displayUserDetails
+GET     /change-password            controllers.ChangePasswordController.changePassword
+POST    /change-password            controllers.ChangePasswordController.changePasswordPost
 POST    /delete                     controllers.AccountController.deleteUser
 GET     /error                      controllers.ErrorController.error
 GET     /army                       controllers.ArmyController.displayArmyList

@@ -10,7 +10,7 @@ import scala.concurrent.Future
 
 class DefaultChangePasswordService extends DefaultUserDatabaseConnector with GenericPasswordChangeService {
 
-  override def changePassword(userId: String, password: Array[Byte], salt: Array[Byte]): Future[UpdateWriteResult] = {
+  override def changePassword(userId: String, hashedAndSaltedPassword: Array[Byte], salt: Array[Byte]): Future[UpdateWriteResult] = {
     userCollection.flatMap { users =>
       users.update(
         BSONDocument(
@@ -18,7 +18,7 @@ class DefaultChangePasswordService extends DefaultUserDatabaseConnector with Gen
         ),
         BSONDocument {
           "$set" -> BSONDocument(
-            "password" -> password,
+            "password" -> hashedAndSaltedPassword,
             "salt" -> salt
           )
         },

@@ -34,7 +34,7 @@ abstract class ControllerIT extends UnitSpec with Results {
   val simpleRequest = FakeRequest()
 }
 
-abstract class AsyncControllerSpec extends AsyncFlatSpec with Results {
+abstract class AsyncControllerSpec extends AsyncUnitSpec with Results {
   val controller: Controller
   val application = new GuiceApplicationBuilder()
     .overrides(bind[DatabaseConnector].to[MockDatabaseConnector])

@@ -7,4 +7,5 @@ login.validation.topology.help.header=Why is my password too predictable?
 login.validation.topology.help.content=Most passwords that people choose fall in to one of a few simple patterns. If you see this message it means your password matched one of the most common patterns and would be too easy for an attacker to guess. Maybe shuffle around the password you just entered, mixing up the letters, numbers and other symbols. It is much better to have a complicated password written down than to memorize a simple one!
 login.validation.characters=Your password must include at least one upper case letter, lower case letter, numeric digit and special character.
 login.validation.unauthorised=The userId you entered does not match your current session
+login.validation.oldpassword=The password you entered was incorrect
 error.required=The {0} field is required

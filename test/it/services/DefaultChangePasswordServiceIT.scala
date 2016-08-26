@@ -15,7 +15,7 @@ class DefaultChangePasswordServiceIT extends AsyncServiceSpec with BeforeAndAfte
   implicit val userDatabaseConnector = application.injector.instanceOf[UserDatabaseConnector]
 
   before {
-    Await.ready(service.deleteUser(User("user", "password")), Duration.Inf)
+    Await.ready(service.deleteUser(User("user", "password ")), Duration.Inf)
     Await.ready(service.createNewUser(User("user", "password")), Duration.Inf)
   }
 
@@ -33,7 +33,7 @@ class DefaultChangePasswordServiceIT extends AsyncServiceSpec with BeforeAndAfte
             .one[DatabaseUser]
             .map(user => {
               (new String(user.get.password), new String(user.get.salt))
-                .mustBe (password, salt)
+                .mustBe(password, salt)
             })
         }
       }
