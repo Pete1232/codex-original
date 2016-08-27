@@ -9,6 +9,7 @@ import connectors.UserDatabaseConnector
 import forms.ChangePasswordForm
 import models.User
 import play.Logger
+import play.api.data.FormError
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, Controller}
 import services.GenericPasswordChangeService
@@ -23,7 +24,10 @@ class ChangePasswordController @Inject()(passwordChangeService: GenericPasswordC
   val changePasswordForm = new ChangePasswordForm().form
 
   def changePassword = Action { implicit request =>
-    Ok(views.html.change_password(changePasswordForm)).withHeaders()
+    request2session.get("userId") match {
+      case Some(userId) => Ok(views.html.change_password(changePasswordForm)).withHeaders()
+      case _ => Redirect(routes.LoginController.login(Some("/change-password")))
+    }
   }
 
   def changePasswordPost = Action.async { implicit request =>
@@ -34,22 +38,31 @@ class ChangePasswordController @Inject()(passwordChangeService: GenericPasswordC
         Future.successful(BadRequest(views.html.change_password(formWithErrors)))
       },
       passwordData => {
-        Logger.debug("Validating user credentials")
-        val userName: Option[String] = request.session.get("userId")
-        Logger.debug("User" + userName.get)
-        //        TODO Refactor - Should throw system error on no userId (should have been authenticated twice by this point!)
-        userDatabaseConnector.validatePasswordForUser(User(userName.get, passwordData._1))
-          .collect {
-            case valid => {
-              val salt = generateSalt
-              passwordChangeService.changePassword(
-                userName.get,
-                hashPassword(passwordData._2, salt),
-                salt
-              )
-              Redirect("/")
-            }
+        if (passwordData._2 != passwordData._3) {
+          val form = changePasswordForm.bindFromRequest.copy(errors = Seq(FormError("newPasswordConfirm", "login.validation.passwordMismatch")))
+          Future.successful(BadRequest(views.html.change_password(form)))
+        }
+        else {
+          val userName: Option[String] = request.session.get("userId")
+          if(userName.isDefined) {
+            Logger.debug("Validating user credentials")
+            userDatabaseConnector.validatePasswordForUser(User(userName.get, passwordData._1))
+              .collect {
+                case valid => {
+                  val salt = generateSalt
+                  passwordChangeService.changePassword(
+                    userName.get,
+                    hashPassword(passwordData._2, salt),
+                    salt
+                  )
+                  Redirect("/")
+                }
+              }
           }
+          else {
+            Future.successful(Redirect(routes.LoginController.login(Some("/change-password"))))
+          }
+        }
       }
     )
   }

@@ -28,6 +28,7 @@ class ChangePasswordControllerSpec extends AsyncControllerSpec with I18nSupport 
     val result = controller.changePassword()
       .apply(FakeRequest()
         .copyFakeRequest(tags = csrfTags)
+        .withSession("userId" -> "user")
       )
     status(result) mustBe 200
     contentAsString(result) must include("<title>Change Password</title>")
@@ -36,6 +37,7 @@ class ChangePasswordControllerSpec extends AsyncControllerSpec with I18nSupport 
     val result = controller.changePassword()
       .apply(FakeRequest()
         .copyFakeRequest(tags = csrfTags)
+        .withSession("userId" -> "user")
       )
     val resultString = contentAsString(result)
 
@@ -45,32 +47,33 @@ class ChangePasswordControllerSpec extends AsyncControllerSpec with I18nSupport 
     resultString must include("<input type=\"text\" id=\"newPasswordConfirm\" name=\"newPasswordConfirm\"")
     resultString must include regex (s"""<input type=\"hidden\" name=\"csrfToken\" value=\"${csrfTags.apply("CSRF_TOKEN_RE_SIGNED")}\"/>""".r)
   }
+  it must "allow an authenticated user to view the page" in running(application) {
+    val result = controller.changePassword
+      .apply(
+        FakeRequest()
+          .copyFakeRequest(tags = csrfTags)
+          .withSession("userId" -> "user")
+      )
+    status(result) mustBe 200
+    contentAsString(result) must include("<title>Change Password</title>")
+  }
+  it should "redirect an unauthenticated user to login" in {
+    val result = controller.changePassword.apply(simpleRequest)
+    status(result) mustBe 303
+    redirectLocation(result).get mustBe ("/login?continueUrl=%2Fchange-password")
+  }
 
   "changePasswordPost" must "return a form with errors if the form had missing data" in running(application) {
     val fieldRequiredResult = controller.changePasswordPost()
       .apply(FakeRequest()
         .copyFakeRequest(tags = csrfTags)
+        .withSession("userId" -> "user")
       )
     val resultString = contentAsString(fieldRequiredResult)
     resultString must include("<div class=\"alert-message error\">")
     resultString must include(Messages("error.required", "oldPassword"))
     resultString must include(Messages("error.required", "newPassword"))
     resultString must include(Messages("error.required", "newPasswordConfirm"))
-  }
-  it must "return a form with errors if the credentials were wrong" ignore running(application) {
-    val changePasswordFailedResult = controller.changePasswordPost()
-      .apply(FakeRequest()
-        .copyFakeRequest(tags = csrfTags)
-        .withFormUrlEncodedBody(
-          "oldPassword" -> "badPassword",
-          "newPassword" -> "p2ssWord!",
-          "newPasswordConfirm" -> "p2ssWord!"
-        )
-        .withSession("userId" -> "user")
-      )
-    val resultString = contentAsString(changePasswordFailedResult)
-    resultString must include("<div class=\"alert-message error\">")
-    resultString must include(Messages("login.validation.oldpassword"))
   }
   it must "redirect to home without a session cookie after login" in running(application) {
     val changePasswordSuccessResult = controller.changePasswordPost()
@@ -87,9 +90,42 @@ class ChangePasswordControllerSpec extends AsyncControllerSpec with I18nSupport 
     redirectLocation(changePasswordSuccessResult).get mustBe "/"
     session(changePasswordSuccessResult) mustBe (Session(Map()))
   }
-  it must "require a CSRF token to be present" in {
+  it must "require a CSRF token to be present" in running(application) {
     intercept[RuntimeException] {
-      contentAsString(controller.changePasswordPost().apply(simpleRequest))
+      contentAsString(controller.changePasswordPost()
+        .apply(simpleRequest
+          .withSession("userId" -> "user")
+        )
+      )
     }.getMessage mustBe ("No CSRF token present!")
+  }
+  it must "require the password and password check to match" in running(application) {
+    val passwordMismatchResult = controller.changePasswordPost()
+      .apply(FakeRequest.apply()
+        .copyFakeRequest(tags = csrfTags)
+        .withFormUrlEncodedBody(
+          "oldPassword" -> "password",
+          "newPassword" -> "p2ssWord!",
+          "newPasswordConfirm" -> "p3ssWord!"
+        )
+        .withSession("userId" -> "user")
+      )
+    status(passwordMismatchResult) mustBe 400
+    val resultString = contentAsString(passwordMismatchResult)
+    resultString must include("<div class=\"alert-message error\">")
+    resultString must include(Messages("login.validation.passwordMismatch"))
+  }
+  it should "redirect an unauthenticated user to login" in running(application) {
+    val result = controller.changePasswordPost
+      .apply(FakeRequest()
+        .copyFakeRequest(tags = csrfTags)
+        .withFormUrlEncodedBody(
+          "oldPassword" -> "password",
+          "newPassword" -> "p2ssWord!",
+          "newPasswordConfirm" -> "p2ssWord!"
+        )
+      )
+    status(result) mustBe 303
+    redirectLocation(result).get mustBe ("/login?continueUrl=%2Fchange-password")
   }
 }
