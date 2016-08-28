@@ -30,7 +30,8 @@ libraryDependencies += filters
 lazy val appDependencies = Seq(
   "org.webjars" %% "webjars-play" % "2.5.0",
   "org.webjars" % "bootstrap" % "3.3.6",
-  "org.reactivemongo" %% "play2-reactivemongo" % "0.11.14"
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.11.14",
+  "com.typesafe.play" %% "play-mailer" % "5.0.0"
 )
 
 lazy val testDependencies = Seq(
