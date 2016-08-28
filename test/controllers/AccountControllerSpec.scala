@@ -28,6 +28,15 @@ class AccountControllerSpec extends ControllerSpec {
     status(result) mustBe 303
     redirectLocation(result).get mustBe ("/login?continueUrl=%2Faccount")
   }
+  it must "contain a link to the change password page" in running(application){
+    val result = controller.displayUserDetails
+      .apply(
+        FakeRequest()
+          .copyFakeRequest(tags = csrfTags)
+          .withSession("userId" -> "user")
+      )
+    contentAsString(result) must include regex ("""(<a href="/change-password")(.*)""".r)
+  }
   "deleteUser" must "redirect to the logout controller" in running(application) {
     val result = controller.deleteUser.apply(simpleRequest.withSession("userId" -> "user"))
     status(result) mustBe 303
